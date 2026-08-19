@@ -1,10 +1,10 @@
-Week 1 Day 1 – PostgreSQL Database Setup
+## Week 1 Day 1 – PostgreSQL Database Setup
 
 Objective
 
 To set up the PostgreSQL database environment for the Customer Churn Prediction & Lifetime Value (LTV) Engine project and establish the initial database configuration.
 
-Tasks Performed
+## Tasks Performed
 
 1. Installed and configured PostgreSQL Database Management System.
 2. Installed pgAdmin for database administration and monitoring.
@@ -13,14 +13,14 @@ Tasks Performed
 5. Verified successful database connectivity.
 6. Organized the project folder structure for database development.
 
-Database Information
+## Database Information
 
 * Database Name: customer_churn_db
 * Database System: PostgreSQL
 * Management Tool: pgAdmin 4
 * Project: Customer Churn Prediction & Lifetime Value (LTV) Engine
 
-Folder Structure Created
+## Folder Structure Created
 
 project/
 │
@@ -31,7 +31,7 @@ project/
 ├── scripts/
 └── README.md
 
-Observations
+## Observations
 
 * PostgreSQL was installed successfully.
 * Database connection was established without errors.
@@ -39,10 +39,10 @@ Observations
 * The project environment is ready for schema creation and data loading.
 * The database will serve as the central repository for customer churn data.
 
-Outcome
+## Outcome
 
 The PostgreSQL environment and project database were successfully configured. The system is now ready for customer table creation and dataset ingestion in subsequent phases.
 
-Conclusion
+## Conclusion
 
 The initial database setup was completed successfully. A stable PostgreSQL environment has been established to support data storage, querying, and future analytics operations for the Customer Churn Prediction and LTV Engine project.
