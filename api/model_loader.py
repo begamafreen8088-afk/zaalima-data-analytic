@@ -2,12 +2,14 @@ import joblib
 from pathlib import Path
 
 
-MODEL_PATH = Path("models/best_ltv_model.pkl")
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MODEL_PATH = BASE_DIR / "person3" / "xgboost_churn_model.pkl"
 
 
 def load_model():
     """
-    Load the trained LTV regression model.
+    Load the trained XGBoost churn prediction model.
     """
 
     if not MODEL_PATH.exists():

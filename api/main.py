@@ -1,65 +1,237 @@
 from fastapi import FastAPI, HTTPException
+import pandas as pd
+import joblib
 
-from api.schemas import CustomerInput
 from api.model_loader import load_model
-
-
-app = FastAPI(
-    title="Customer LTV Prediction API",
-    description="API for predicting Customer Lifetime Value (LTV)",
-    version="1.0.0"
+from api.schemas import (
+    CustomerInput,
+    PredictionResponse,
+    BatchPredictionRequest,
+    BatchPredictionResponse,
 )
 
+
+# --------------------------------------------------
+# Load Model
+# --------------------------------------------------
+
+try:
+    model = load_model()
+except Exception as e:
+    model = None
+    print(f"Model loading failed: {e}")
+
+
+# --------------------------------------------------
+# Load Label Encoders
+# --------------------------------------------------
+
+try:
+    encoders = joblib.load("person3/label_encoders.pkl")
+except Exception as e:
+    encoders = None
+    print(f"Encoder loading failed: {e}")
+
+
+# --------------------------------------------------
+# FastAPI Application
+# --------------------------------------------------
+
+app = FastAPI(
+    title="Customer Churn Prediction API",
+    description="FastAPI API for single and batch customer churn prediction",
+    version="1.0.0",
+)
+
+
+# --------------------------------------------------
+# Root
+# --------------------------------------------------
 
 @app.get("/")
 def root():
     return {
-        "message": "Customer LTV Prediction API is running"
+        "message": "Customer Churn Prediction API is running"
     }
 
+
+# --------------------------------------------------
+# Health Check
+# --------------------------------------------------
 
 @app.get("/health")
-def health_check():
+def health():
     return {
-        "status": "healthy"
+        "status": "healthy",
+        "model_loaded": model is not None,
+        "encoders_loaded": encoders is not None,
     }
 
 
-@app.post("/predict")
-def predict_ltv(customer: CustomerInput):
+# --------------------------------------------------
+# Prepare Customer Data
+# --------------------------------------------------
 
-    try:
-        # Load trained model
-        model = load_model()
+def prepare_customer(customer: CustomerInput):
 
-        # Prepare customer input
-        input_data = [[
-            customer.tenure,
-            customer.monthly_charges,
-            customer.total_charges
-        ]]
+    data = {
+        "gender": customer.gender,
+        "SeniorCitizen": customer.SeniorCitizen,
+        "Partner": customer.Partner,
+        "Dependents": customer.Dependents,
+        "tenure": customer.tenure,
+        "PhoneService": customer.PhoneService,
+        "MultipleLines": customer.MultipleLines,
+        "InternetService": customer.InternetService,
+        "OnlineSecurity": customer.OnlineSecurity,
+        "OnlineBackup": customer.OnlineBackup,
+        "DeviceProtection": customer.DeviceProtection,
+        "TechSupport": customer.TechSupport,
+        "StreamingTV": customer.StreamingTV,
+        "StreamingMovies": customer.StreamingMovies,
+        "Contract": customer.Contract,
+        "PaperlessBilling": customer.PaperlessBilling,
+        "PaymentMethod": customer.PaymentMethod,
+        "MonthlyCharges": customer.MonthlyCharges,
+        "TotalCharges": customer.TotalCharges,
+    }
 
-        # Generate prediction
-        prediction = model.predict(input_data)
+    df = pd.DataFrame([data])
 
-        # Return prediction
-        return {
-            "predicted_ltv": round(
-                float(prediction[0]),
-                2
+    # Encode categorical columns
+    categorical_columns = [
+        "gender",
+        "Partner",
+        "Dependents",
+        "PhoneService",
+        "MultipleLines",
+        "InternetService",
+        "OnlineSecurity",
+        "OnlineBackup",
+        "DeviceProtection",
+        "TechSupport",
+        "StreamingTV",
+        "StreamingMovies",
+        "Contract",
+        "PaperlessBilling",
+        "PaymentMethod",
+    ]
+
+    if encoders is None:
+        raise ValueError("Label encoders are not loaded")
+
+    for column in categorical_columns:
+
+        if column not in encoders:
+            raise ValueError(
+                f"Encoder not found for column: {column}"
             )
-        }
 
-    except FileNotFoundError as error:
+        encoder = encoders[column]
 
+        try:
+            df[column] = encoder.transform(df[column])
+        except ValueError:
+            raise ValueError(
+                f"Invalid value '{df[column].iloc[0]}' "
+                f"for column '{column}'. "
+                f"Allowed values: {list(encoder.classes_)}"
+            )
+
+    return df
+
+
+# --------------------------------------------------
+# Single Customer Prediction
+# --------------------------------------------------
+
+@app.post(
+    "/predict",
+    response_model=PredictionResponse
+)
+def predict(request: CustomerInput):
+
+    if model is None:
         raise HTTPException(
-            status_code=503,
-            detail=str(error)
+            status_code=500,
+            detail="Model is not loaded"
         )
 
-    except Exception as error:
+    try:
+
+        df = prepare_customer(request)
+
+        prediction = model.predict(df)[0]
+
+        probability = model.predict_proba(df)[0][1]
+
+        return {
+            "prediction": int(prediction),
+            "probability": float(probability),
+        }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=422,
+            detail=str(e)
+        )
+
+    except Exception as e:
 
         raise HTTPException(
             status_code=500,
-            detail=f"Prediction failed: {str(error)}"
+            detail=f"Prediction failed: {str(e)}"
+        )
+
+
+# --------------------------------------------------
+# Batch Prediction
+# --------------------------------------------------
+
+@app.post(
+    "/batch_predict",
+    response_model=BatchPredictionResponse
+)
+def batch_predict(request: BatchPredictionRequest):
+
+    if model is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Model is not loaded"
+        )
+
+    try:
+
+        results = []
+
+        for customer in request.customers:
+
+            df = prepare_customer(customer)
+
+            prediction = model.predict(df)[0]
+
+            probability = model.predict_proba(df)[0][1]
+
+            results.append({
+                "prediction": int(prediction),
+                "probability": float(probability),
+            })
+
+        return {
+            "predictions": results
+        }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=422,
+            detail=str(e)
+        )
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Batch prediction failed: {str(e)}"
         )
