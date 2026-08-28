@@ -8,7 +8,7 @@
 
 Customer retention is one of the most important challenges faced by telecom and subscription-based businesses. This project aims to predict customer churn and estimate Customer Lifetime Value (LTV) using machine learning techniques. The system helps organizations identify customers at risk of leaving and prioritize high-value customers for retention campaigns.
 
-⸻
+
 
 ## Problem Statement
 
@@ -19,7 +19,7 @@ Businesses lose revenue when customers discontinue their services. Acquiring new
 * Generating business insights for customer retention strategies.
 * Supporting data-driven decision making.
 
-⸻
+
 
 ## Dataset Information
 
@@ -39,7 +39,7 @@ Source: Kaggle / IBM Watson Analytics
 
 Total Records: 7000+ customers
 
-⸻
+
 
 ## Technology Stack
 
@@ -73,7 +73,7 @@ Total Records: 7000+ customers
 
 * Apache Superset / Metabase
 
-⸻
+
 
 ## Project Architecture
 
@@ -111,7 +111,7 @@ FastAPI Prediction Service
 
 Business Insights & Dashboard
 
-⸻
+
 
 ## Week-wise Project Progress
 
@@ -143,7 +143,7 @@ Business Insights & Dashboard
 * Clean dataset creation
 * Baseline churn analytics
 
-⸻
+
 
 ## Week 2 – Churn Prediction Modeling
 
@@ -170,7 +170,7 @@ Business Insights & Dashboard
 * Feature Importance Analysis
 * SHAP Explainability
 
-⸻
+
 
 ## Week 3 – LTV Prediction & API Development
 
@@ -195,7 +195,7 @@ Business Insights & Dashboard
 * Swagger API documentation
 * Model integration
 
-⸻
+
 
 ## Machine Learning Models
 
@@ -211,7 +211,7 @@ LTV Prediction Models
 2. Random Forest Regressor
 3. XGBoost Regressor
 
-⸻
+
 
 ## Evaluation Metrics
 
@@ -229,7 +229,7 @@ Regression Metrics
 * RMSE
 * R² Score
 
-⸻
+
 
 ## API Endpoints
 
@@ -251,7 +251,7 @@ Predicts:
 
 * Churn and LTV for multiple customers simultaneously
 
-⸻
+
 
 ## Key Features
 
@@ -264,7 +264,7 @@ Predicts:
 * Business Insight Generation
 * Scalable Production-Oriented Architecture
 
-⸻
+
 
 ## Team Members & Contributions
 
@@ -297,7 +297,7 @@ Responsibilities:
 - SHAP Explainability Analysis
 - FastAPI Development
 - API Integration
-⸻
+
 
 ## Expected Business Impact
 
@@ -307,7 +307,7 @@ Responsibilities:
 * Optimize marketing campaign budgets.
 * Enable data-driven business decisions.
 
-⸻
+
 
 ## Future Enhancements
 
@@ -317,7 +317,7 @@ Responsibilities:
 * Automated model retraining pipeline.
 * Advanced customer segmentation.
 
-⸻
+
 
 ## Project Status
 
