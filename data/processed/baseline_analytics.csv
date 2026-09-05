@@ -1,2 +1,0 @@
-total_customers,churned_customers,non_churned_customers,churn_rate_percent,retention_rate_percent,baseline_majority_class,baseline_accuracy_percent
-7010,1857,5153,26.49,73.51,0,73.51
