@@ -185,6 +185,18 @@ Business Insights & Dashboard
 * Swagger API documentation
 * Model integration
 
+## Week 4 – Business Intelligence & Churn Trend Reporting
+
+### Churn Trend Analysis & Executive Reporting
+
+* Longitudinal tenure cohort survival analysis
+* Contract structure & commitment risk evaluation
+* Revenue-at-risk & monthly spend tier vulnerability
+* Service ecosystem & protective stickiness buffers
+* Payment channel & billing friction assessment
+* 2x2 Value vs. Risk retention segmentation matrix
+* Interactive standalone HTML retention dashboard
+
 ## Machine Learning Models
 
 Churn Prediction Models
