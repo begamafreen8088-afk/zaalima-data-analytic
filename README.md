@@ -185,17 +185,29 @@ Business Insights & Dashboard
 * Swagger API documentation
 * Model integration
 
-## Week 4 – Business Intelligence & Churn Trend Reporting
+## Week 4 – Business Intelligence, Churn Trends & Risk Intelligence Suite
 
-### Churn Trend Analysis & Executive Reporting
-
+### Day 1: Churn Trend Analysis & Executive Reporting
 * Longitudinal tenure cohort survival analysis
 * Contract structure & commitment risk evaluation
 * Revenue-at-risk & monthly spend tier vulnerability
 * Service ecosystem & protective stickiness buffers
 * Payment channel & billing friction assessment
 * 2x2 Value vs. Risk retention segmentation matrix
-* Interactive standalone HTML retention dashboard
+* Interactive standalone HTML retention trends dashboard (`Reports/churn_trends_dashboard.html`)
+
+### Day 2: Predictive Churn Risk Dashboard & Retention Engine
+* Individual customer-level churn risk probability scoring (7,043 accounts)
+* Calibrated Churn Risk Tiers: Critical (≥70%), High (45–70%), Medium (25–45%), Low (<25%)
+* Top hazard catalysts vs. protective retention moat quantification
+* Monthly recurring revenue ($139.6k/mo) and multi-year LTV exposure analysis
+* 2x2 Value vs. Risk retention action matrix (Immediate Intervention, Automated Nurture, Core VIP Protect, Low Maintenance)
+* Interactive executive Churn Risk Dashboard (`Reports/churn_risk_dashboard.html`)
+  - Live filterable customer risk explorer with pagination and CSV export
+  - Real-time customer risk & LTV profiler simulator with dynamic SVG gauge
+  - Portfolio retention campaign ROI simulator
+  - Departmental SLA retention playbooks (Customer Success, Marketing, Billing)
+* Comprehensive executive markdown report (`Reports/churn_risk_report.md`)
 
 ## Machine Learning Models
 
