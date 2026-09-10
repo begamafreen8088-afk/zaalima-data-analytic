@@ -738,6 +738,9 @@ html_template = f"""<!DOCTYPE html>
         <a href="churn_trends_dashboard.html" class="btn btn-switch" title="Switch to Historical Trend Diagnostic Dashboard">
           <span>📈</span> Churn Trends Dashboard
         </a>
+        <a href="customer_segmentation_dashboard.html" class="btn btn-switch" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3);" title="Switch to Customer Segmentation & Behavioral Analytics">
+          <span>👥</span> Customer Segmentation
+        </a>
         <button onclick="window.print()" class="btn" title="Print Executive Briefing">
           <span>🖨️</span> Print Report
         </button>

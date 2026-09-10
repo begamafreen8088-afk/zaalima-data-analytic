@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Segmentation & Behavioral Intelligence Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #090d16;
+      --bg-secondary: #0f172a;
+      --bg-card: rgba(15, 23, 42, 0.78);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      
+      --critical-red: #ef4444;
+      --high-orange: #f97316;
+      --medium-amber: #f59e0b;
+      --low-emerald: #10b981;
+      --accent-indigo: #6366f1;
+      --accent-cyan: #0ea5e9;
+      --accent-purple: #a855f7;
+      
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .glow-sphere-1 {
+      position: fixed;
+      top: -120px;
+      right: 10%;
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(99, 102, 241, 0.05) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-sphere-2 {
+      position: fixed;
+      bottom: -150px;
+      left: 5%;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(14, 165, 233, 0.04) 50%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2rem 2rem 5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2.2rem;
+      padding-bottom: 1.8rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-left h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-pill {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      -webkit-text-fill-color: initial;
+    }
+
+    .badge-version {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .header-subtitle {
+      color: var(--text-muted);
+      font-size: 0.96rem;
+      margin-top: 0.4rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1.15rem;
+      border-radius: 0.75rem;
+      font-size: 0.86rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--accent-purple);
+      border-color: var(--accent-purple);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: #9333ea;
+      border-color: #9333ea;
+    }
+
+    .btn-switch {
+      background: rgba(14, 165, 233, 0.12);
+      border-color: rgba(14, 165, 233, 0.3);
+      color: #38bdf8;
+    }
+
+    .btn-switch:hover {
+      background: rgba(14, 165, 233, 0.2);
+      border-color: #38bdf8;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #f87171;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+      gap: 1.15rem;
+      margin-bottom: 2.2rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.3rem 1.25rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-highlight);
+      box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.6);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--accent-color, var(--accent-indigo));
+    }
+
+    .kpi-label {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .kpi-subtext {
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    .kpi-subtext span.dot {
+      font-size: 0.7rem;
+    }
+
+    /* Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 0.55rem;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .nav-tab {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.6rem 1.2rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-tab.active {
+      background: var(--accent-purple);
+      color: #ffffff;
+      border-color: var(--accent-purple);
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+    }
+
+    /* Tab Content */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Dashboard Layouts */
+    .dashboard-section {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-color);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      margin-bottom: 1.6rem;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .chart-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .chart-box img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      transition: transform 0.2s ease;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Persona Cards Grid */
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    .persona-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.4rem;
+      border-top: 4px solid var(--accent-color, #94a3b8);
+      position: relative;
+    }
+
+    .persona-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .persona-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .persona-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .persona-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 0.85rem;
+      border-radius: 0.6rem;
+      font-size: 0.82rem;
+    }
+
+    .persona-stat-item label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+
+    .persona-stat-item span {
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: #f1f5f9;
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 0.85rem;
+      border: 1px solid var(--border-color);
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.74rem;
+      letter-spacing: 0.05em;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Explorer Filters */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1.2rem;
+      border-radius: 0.85rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .filter-item {
+      flex: 1;
+      min-width: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .filter-item label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border-color);
+      border-radius: 0.55rem;
+      padding: 0.55rem 0.85rem;
+      color: #ffffff;
+      font-size: 0.85rem;
+      outline: none;
+      font-family: var(--font-sans);
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25);
+    }
+
+    /* Pagination */
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-sphere-1"></div>
+  <div class="glow-sphere-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <h1>
+          Customer Segmentation & Behavioral Analytics
+          <span class="badge-pill">Week 4 Day 3 Milestone</span>
+          <span class="badge-pill badge-version">ML: K-Means (k=4) + PCA 2D</span>
+        </h1>
+        <p class="header-subtitle">
+          RFM Behavioral Personas, Unsupervised ML Clusters, Lifecycle × Value Cross-Tabulations & Tailored Retention Strategies
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <a href="churn_trends_dashboard.html" class="btn btn-switch" title="View Churn Trend Reports">
+          <span>📈</span> Churn Trends
+        </a>
+        <a href="churn_risk_dashboard.html" class="btn btn-danger" title="View Predictive Churn Risk Dashboard">
+          <span>⚠️</span> Churn Risk Dashboard
+        </a>
+        <button onclick="window.print()" class="btn" title="Print Report">
+          <span>🖨️</span> Print
+        </button>
+        <button onclick="exportSegmentsCSV()" class="btn btn-primary" title="Export Full Segments CSV">
+          <span>📥</span> Export Segments CSV
+        </button>
+      </div>
+    </header>
+
+    <!-- Top KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--accent-color: var(--accent-purple);">
+        <div class="kpi-label">Strategic Personas</div>
+        <div class="kpi-value" style="color: #c084fc;">6 Personas</div>
+        <div class="kpi-subtext">
+          <span class="dot" style="color: #c084fc;">●</span> 7,043 Accounts Classified
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--low-emerald);">
+        <div class="kpi-label">Champions & VIP Loyalists</div>
+        <div class="kpi-value" style="color: var(--low-emerald);">1,405</div>
+        <div class="kpi-subtext">
+          <span class="dot" style="color: var(--low-emerald);">●</span> 19.9% base | $131.5k MRR | 3.6% Churn
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--critical-red);">
+        <div class="kpi-label">At-Risk High Rollers</div>
+        <div class="kpi-value" style="color: var(--critical-red);">811</div>
+        <div class="kpi-subtext">
+          <span class="dot" style="color: var(--critical-red);">●</span> $48.1k/mo MRR At Risk (84.1% Churn)
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--high-orange);">
+        <div class="kpi-label">Vulnerable Newcomers</div>
+        <div class="kpi-value" style="color: var(--high-orange);">894</div>
+        <div class="kpi-subtext">
+          <span class="dot" style="color: var(--high-orange);">●</span> $43.4k/mo MRR At Risk (79.8% Churn)
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--accent-indigo);">
+        <div class="kpi-label">ML Clusters (K-Means)</div>
+        <div class="kpi-value" style="color: #a5b4fc;">4 Clusters</div>
+        <div class="kpi-subtext">
+          <span class="dot" style="color: #a5b4fc;">●</span> 91.1% PCA 2D Explained Variance
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--accent-cyan);">
+        <div class="kpi-label">Enterprise Moats (C-B)</div>
+        <div class="kpi-value" style="color: var(--accent-cyan);">$5,936</div>
+        <div class="kpi-subtext">
+          <span class="dot" style="color: var(--accent-cyan);">●</span> Mean LTV across 1,533 long-term VIPs
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('personas')">👥 Behavioral RFM Personas</button>
+      <button class="nav-tab" onclick="switchTab('kmeans')">🤖 K-Means Clustering & PCA</button>
+      <button class="nav-tab" onclick="switchTab('lifecycle')">🗺️ Lifecycle × Spend Matrix</button>
+      <button class="nav-tab" onclick="switchTab('services')">🛠️ Service Stickiness</button>
+      <button class="nav-tab" onclick="switchTab('portfolio')">🎯 LTV vs. Churn Hazard Matrix</button>
+      <button class="nav-tab" onclick="switchTab('explorer')">🔍 Interactive Segment Explorer</button>
+      <button class="nav-tab" onclick="switchTab('playbooks')">📋 Retention Playbooks</button>
+    </div>
+
+    <!-- TAB 1: Behavioral RFM Personas -->
+    <div id="tab-personas" class="tab-panel active">
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2 class="section-title">Strategic RFM & Behavioral Personas</h2>
+          <p class="section-desc">Multi-dimensional segmentation classifying customer accounts by tenure longevity, ARPU, service breadth, and churn propensity.</p>
+        </div>
+
+        <div class="chart-box">
+          <img src="customer_segmentation_rfm_personas.png" alt="Customer Segmentation RFM Personas">
+        </div>
+
+        <!-- Persona Cards -->
+        <div class="persona-grid">
+          <div class="persona-card" style="--accent-color: #10b981;">
+            <div class="persona-title">
+              <span>Champions & VIP Loyalists</span>
+              <span class="persona-badge" style="color: #10b981;">Ultra High Value</span>
+            </div>
+            <p class="persona-desc">Tenure &ge;36 months, premium monthly spend (&ge;$70/mo), low churn risk (&lt;25%). Multi-product adoption creates strong structural moats.</p>
+            <div class="persona-stats">
+              <div class="persona-stat-item"><label>Accounts</label><span>1,405 (19.9%)</span></div>
+              <div class="persona-stat-item"><label>Avg ARPU</label><span>$93.62/mo</span></div>
+              <div class="persona-stat-item"><label>Churn Rate</label><span style="color: #10b981;">3.56%</span></div>
+              <div class="persona-stat-item"><label>Total MRR</label><span>$131,532/mo</span></div>
+            </div>
+          </div>
+
+          <div class="persona-card" style="--accent-color: #ef4444;">
+            <div class="persona-title">
+              <span>At-Risk High Rollers</span>
+              <span class="persona-badge" style="color: #ef4444;">Highest Hazard</span>
+            </div>
+            <p class="persona-desc">Paying premium rates (&ge;$70/mo) but operating on month-to-month terms without protective tech support or security add-ons. 84.1% churn rate.</p>
+            <div class="persona-stats">
+              <div class="persona-stat-item"><label>Accounts</label><span>811 (11.5%)</span></div>
+              <div class="persona-stat-item"><label>Avg ARPU</label><span>$90.86/mo</span></div>
+              <div class="persona-stat-item"><label>Churn Rate</label><span style="color: #ef4444;">84.09%</span></div>
+              <div class="persona-stat-item"><label>MRR At Risk</label><span style="color: #ef4444;">$48,143/mo</span></div>
+            </div>
+          </div>
+
+          <div class="persona-card" style="--accent-color: #f97316;">
+            <div class="persona-title">
+              <span>Vulnerable Newcomers</span>
+              <span class="persona-badge" style="color: #f97316;">Critical Flight Risk</span>
+            </div>
+            <p class="persona-desc">Subscribed &le;6 months on month-to-month contracts with acute initial friction. 79.8% churn rate within first 180 days.</p>
+            <div class="persona-stats">
+              <div class="persona-stat-item"><label>Accounts</label><span>894 (12.7%)</span></div>
+              <div class="persona-stat-item"><label>Avg ARPU</label><span>$67.93/mo</span></div>
+              <div class="persona-stat-item"><label>Churn Rate</label><span style="color: #f97316;">79.75%</span></div>
+              <div class="persona-stat-item"><label>MRR At Risk</label><span style="color: #f97316;">$43,365/mo</span></div>
+            </div>
+          </div>
+
+          <div class="persona-card" style="--accent-color: #a855f7;">
+            <div class="persona-title">
+              <span>Digital Enthusiasts & Streamers</span>
+              <span class="persona-badge" style="color: #a855f7;">Growth Engine</span>
+            </div>
+            <p class="persona-desc">Fiber optic subscribers with heavy Streaming TV & Movies adoption (&ge;4 services). High ARPU with moderate churn (20.4%).</p>
+            <div class="persona-stats">
+              <div class="persona-stat-item"><label>Accounts</label><span>407 (5.8%)</span></div>
+              <div class="persona-stat-item"><label>Avg ARPU</label><span>$99.14/mo</span></div>
+              <div class="persona-stat-item"><label>Churn Rate</label><span style="color: #a855f7;">20.39%</span></div>
+              <div class="persona-stat-item"><label>Total MRR</label><span>$40,350/mo</span></div>
+            </div>
+          </div>
+
+          <div class="persona-card" style="--accent-color: #0ea5e9;">
+            <div class="persona-title">
+              <span>Budget Anchors</span>
+              <span class="persona-badge" style="color: #0ea5e9;">Stable Foundation</span>
+            </div>
+            <p class="persona-desc">Price-conscious long-tenure customers (&ge;24m) spending &lt;$45/mo on DSL or basic phone lines. Near-zero churn rate (1.69%).</p>
+            <div class="persona-stats">
+              <div class="persona-stat-item"><label>Accounts</label><span>945 (13.4%)</span></div>
+              <div class="persona-stat-item"><label>Avg ARPU</label><span>$24.13/mo</span></div>
+              <div class="persona-stat-item"><label>Churn Rate</label><span style="color: #0ea5e9;">1.69%</span></div>
+              <div class="persona-stat-item"><label>Total MRR</label><span>$22,804/mo</span></div>
+            </div>
+          </div>
+
+          <div class="persona-card" style="--accent-color: #6366f1;">
+            <div class="persona-title">
+              <span>Core Steady Subscribers</span>
+              <span class="persona-badge" style="color: #6366f1;">Mainstream Core</span>
+            </div>
+            <p class="persona-desc">The backbone of portfolio revenue. Moderate tenure, balanced monthly fees ($49/mo), and reliable cash flow with low-to-moderate churn (12.6%).</p>
+            <div class="persona-stats">
+              <div class="persona-stat-item"><label>Accounts</label><span>2,581 (36.6%)</span></div>
+              <div class="persona-stat-item"><label>Avg ARPU</label><span>$49.21/mo</span></div>
+              <div class="persona-stat-item"><label>Churn Rate</label><span style="color: #6366f1;">12.59%</span></div>
+              <div class="persona-stat-item"><label>Total MRR</label><span>$127,008/mo</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: K-Means Clustering & PCA -->
+    <div id="tab-kmeans" class="tab-panel">
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2 class="section-title">Unsupervised K-Means Machine Learning Clustering & PCA Space</h2>
+          <p class="section-desc">Mathematical clustering based on standardized multidimensional coordinates, validated by Elbow Inertia, Silhouette Analysis, and 2D Principal Component Projection.</p>
+        </div>
+
+        <div class="chart-box">
+          <img src="customer_segmentation_kmeans_clusters.png" alt="K-Means Clusters and PCA">
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Cluster Name</th>
+                <th>Account Volume</th>
+                <th>Avg Tenure</th>
+                <th>Avg Monthly Spend</th>
+                <th>Avg Churn Risk</th>
+                <th>Mean LTV</th>
+                <th>Primary Strategic Imperative</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color: #ef4444;">Cluster A: High-Churn Flight Risks</strong></td>
+                <td>1,733 accounts</td>
+                <td>8.6 months</td>
+                <td>$75.66/mo</td>
+                <td><strong style="color: #ef4444;">65.1%</strong></td>
+                <td>$708</td>
+                <td>Urgent SLA outreach, contract subsidies & security bundling</td>
+              </tr>
+              <tr>
+                <td><strong style="color: #10b981;">Cluster B: High-Value Enterprise Moats</strong></td>
+                <td>1,533 accounts</td>
+                <td>62.4 months</td>
+                <td>$95.54/mo</td>
+                <td><strong style="color: #10b981;">13.7%</strong></td>
+                <td><strong style="color: #10b981;">$5,936</strong></td>
+                <td>VIP Concierge loyalty perks, hardware upgrade prioritisation</td>
+              </tr>
+              <tr>
+                <td><strong style="color: #0ea5e9;">Cluster C: Low-Cost Basic Loyalists</strong></td>
+                <td>2,158 accounts</td>
+                <td>26.8 months</td>
+                <td>$27.42/mo</td>
+                <td>10.9%</td>
+                <td>$682</td>
+                <td>Low-touch automated support; cross-sell broadband/streaming</td>
+              </tr>
+              <tr>
+                <td><strong style="color: #a855f7;">Cluster D: Mid-Tier Digital Mainstream</strong></td>
+                <td>1,619 accounts</td>
+                <td>36.8 months</td>
+                <td>$73.72/mo</td>
+                <td>18.1%</td>
+                <td>$2,627</td>
+                <td>Speed boosts & autopay enrollment incentives</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Lifecycle × Spend Matrix -->
+    <div id="tab-lifecycle" class="tab-panel">
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2 class="section-title">Customer Lifecycle Stage &times; Spend Tier Matrix Heatmaps</h2>
+          <p class="section-desc">Cross-tabulation heatmaps isolating account volume concentration, empirical churn percentage, and monthly revenue loss exposure.</p>
+        </div>
+
+        <div class="chart-box">
+          <img src="customer_segmentation_lifecycle_value_matrix.png" alt="Lifecycle Value Matrix">
+        </div>
+
+        <div class="grid-2col" style="margin-top: 1.5rem;">
+          <div style="background: rgba(0,0,0,0.25); padding: 1.25rem; border-radius: 0.85rem; border: 1px solid var(--border-color);">
+            <h4 style="color: #f87171; margin-bottom: 0.5rem;">⚠️ The High-ARPU Early Tenure Trap</h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">
+              Customers in the <strong>New (0-12m) cohort paying Premium (&gt;$90/mo)</strong> suffer an empirical churn rate exceeding <strong>68.4%</strong>. When premium buyers encounter onboarding friction or price-to-value disconnects early, they exit immediately, causing the largest single revenue leak in the portfolio.
+            </p>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 1.25rem; border-radius: 0.85rem; border: 1px solid var(--border-color);">
+            <h4 style="color: #34d399; margin-bottom: 0.5rem;">🛡️ The Veteran Retention Moat</h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">
+              Across all spend tiers, customer churn drops below <strong>7.5% once customers pass month 48</strong>. Even in the highest spend tier (&gt;$90/mo), veteran accounts maintain a 92%+ retention rate, proving that long-tenure habituation and multi-product integration create virtually impenetrable retention moats.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Service Stickiness -->
+    <div id="tab-services" class="tab-panel">
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2 class="section-title">Service Ecosystem Penetration & Technology Stickiness</h2>
+          <p class="section-desc">Evaluating how value-added add-ons (Tech Support, Online Security, Streaming, Device Protection) build retention barriers across personas.</p>
+        </div>
+
+        <div class="chart-box">
+          <img src="customer_segmentation_service_adoption_profiles.png" alt="Service Adoption Profiles">
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Behavioral Persona</th>
+                <th>Tech Support</th>
+                <th>Online Security</th>
+                <th>Device Protection</th>
+                <th>Online Backup</th>
+                <th>Fiber Optic</th>
+                <th>Streaming TV</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color: #10b981;">Champions & VIP Loyalists</strong></td>
+                <td>68.2%</td>
+                <td>69.8%</td>
+                <td>74.1%</td>
+                <td>72.5%</td>
+                <td>61.4%</td>
+                <td>78.9%</td>
+              </tr>
+              <tr>
+                <td><strong style="color: #a855f7;">Digital Enthusiasts & Streamers</strong></td>
+                <td>41.5%</td>
+                <td>39.8%</td>
+                <td>68.3%</td>
+                <td>62.7%</td>
+                <td>100.0%</td>
+                <td>98.5%</td>
+              </tr>
+              <tr>
+                <td><strong style="color: #ef4444;">At-Risk High Rollers</strong></td>
+                <td><strong style="color: #ef4444;">12.3%</strong></td>
+                <td><strong style="color: #ef4444;">10.7%</strong></td>
+                <td>32.1%</td>
+                <td>28.4%</td>
+                <td>89.6%</td>
+                <td>64.2%</td>
+              </tr>
+              <tr>
+                <td><strong style="color: #f97316;">Vulnerable Newcomers</strong></td>
+                <td><strong style="color: #f97316;">14.1%</strong></td>
+                <td><strong style="color: #f97316;">13.8%</strong></td>
+                <td>21.5%</td>
+                <td>22.0%</td>
+                <td>58.2%</td>
+                <td>38.4%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: Portfolio LTV vs. Churn Hazard Matrix -->
+    <div id="tab-portfolio" class="tab-panel">
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2 class="section-title">Strategic Portfolio Matrix: Customer Lifetime Value (LTV) vs. Churn Hazard</h2>
+          <p class="section-desc">Bubble distribution plotting customer accounts by predicted lifetime value and churn probability, sized by monthly charges and mapped to 4 investment zones.</p>
+        </div>
+
+        <div class="chart-box">
+          <img src="customer_segmentation_ltv_risk_quadrants.png" alt="LTV vs Churn Hazard Quadrants">
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: Interactive Segment Explorer -->
+    <div id="tab-explorer" class="tab-panel">
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2 class="section-title">Live Customer Segment Explorer</h2>
+          <p class="section-desc">Interactive query engine to search, filter, and inspect scored customer records across personas, risk tiers, and K-Means clusters.</p>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label for="searchId">Search Customer ID</label>
+            <input type="text" id="searchId" class="form-control" placeholder="e.g. 7590-VHVEG" onkeyup="filterData()">
+          </div>
+
+          <div class="filter-item">
+            <label for="filterPersona">Persona Segment</label>
+            <select id="filterPersona" class="form-control" onchange="filterData()">
+              <option value="ALL">All Personas (All 6)</option>
+              <option value="Champions & VIP Loyalists">Champions & VIP Loyalists</option>
+              <option value="At-Risk High Rollers">At-Risk High Rollers</option>
+              <option value="Vulnerable Newcomers">Vulnerable Newcomers</option>
+              <option value="Digital Enthusiasts & Streamers">Digital Enthusiasts & Streamers</option>
+              <option value="Budget Anchors">Budget Anchors</option>
+              <option value="Core Steady Subscribers">Core Steady Subscribers</option>
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label for="filterCluster">ML Cluster</label>
+            <select id="filterCluster" class="form-control" onchange="filterData()">
+              <option value="ALL">All Clusters</option>
+              <option value="Cluster A">Cluster A: High-Churn Flight Risks</option>
+              <option value="Cluster B">Cluster B: High-Value Enterprise Moats</option>
+              <option value="Cluster C">Cluster C: Low-Cost Basic Loyalists</option>
+              <option value="Cluster D">Cluster D: Mid-Tier Digital Mainstream</option>
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label for="filterTier">Risk Tier</label>
+            <select id="filterTier" class="form-control" onchange="filterData()">
+              <option value="ALL">All Risk Tiers</option>
+              <option value="Critical Risk">Critical Risk (&ge;70%)</option>
+              <option value="High Risk">High Risk (45-70%)</option>
+              <option value="Medium Risk">Medium Risk (25-45%)</option>
+              <option value="Low Risk">Low Risk (&lt;25%)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Explorer Table -->
+        <div class="table-container">
+          <table id="customerTable">
+            <thead>
+              <tr>
+                <th>Customer ID</th>
+                <th>Persona Segment</th>
+                <th>ML Cluster</th>
+                <th>Tenure</th>
+                <th>Contract</th>
+                <th>Monthly Spend</th>
+                <th>Churn Risk</th>
+                <th>Risk Tier</th>
+                <th>Predicted LTV</th>
+                <th>RFM Health</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-bar">
+          <div id="resultCount">Showing 0 of 0 accounts</div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button id="btnPrev" class="btn btn-sm" onclick="changePage(-1)">Previous</button>
+            <span id="pageIndicator" style="display: flex; align-items: center; font-weight: 700;">Page 1</span>
+            <button id="btnNext" class="btn btn-sm" onclick="changePage(1)">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 7: Retention Playbooks -->
+    <div id="tab-playbooks" class="tab-panel">
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2 class="section-title">Persona-Targeted Retention & Action Playbooks</h2>
+          <p class="section-desc">Prescriptive intervention playbooks engineered specifically for the hazard factors and willingness-to-pay of each customer segment.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div style="background: rgba(239, 68, 68, 0.08); border-left: 4px solid #ef4444; padding: 1.25rem; border-radius: 0.6rem;">
+            <h3 style="color: #f87171; font-size: 1.1rem; margin-bottom: 0.4rem;">1. At-Risk High Rollers: Concierge Retention SLA (24-Hour Protocol)</h3>
+            <p style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 0.6rem;">
+              <strong>Trigger:</strong> Scored in At-Risk High Rollers ($90.86/mo avg spend with &ge;45% churn probability).
+            </p>
+            <ul style="font-size: 0.86rem; color: var(--text-muted); margin-left: 1.5rem; line-height: 1.6;">
+              <li><strong>Incentive:</strong> Complimentary 12-month Tech Support & Online Security bundle (addressing the primary hazard factor).</li>
+              <li><strong>Contract Subsidy:</strong> Offer a $15/month bill credit in exchange for a 1-year agreement, saving $780/yr in net account revenue.</li>
+              <li><strong>Channel:</strong> Outbound direct phone contact from dedicated Senior Customer Success Manager.</li>
+            </ul>
+          </div>
+
+          <div style="background: rgba(249, 115, 22, 0.08); border-left: 4px solid #f97316; padding: 1.25rem; border-radius: 0.6rem;">
+            <h3 style="color: #fb923c; font-size: 1.1rem; margin-bottom: 0.4rem;">2. Vulnerable Newcomers: 90-Day Digital Onboarding Nurture</h3>
+            <p style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 0.6rem;">
+              <strong>Trigger:</strong> Tenure &le;6 months on month-to-month terms without security/support features.
+            </p>
+            <ul style="font-size: 0.86rem; color: var(--text-muted); margin-left: 1.5rem; line-height: 1.6;">
+              <li><strong>Incentive:</strong> 60-day free trial of Online Backup and Antivirus Protection during day 14 check-in.</li>
+              <li><strong>Billing Education:</strong> $10 credit to set up Credit Card or Bank ACH Autopay to eliminate monthly manual payment friction.</li>
+              <li><strong>Channel:</strong> Automated SMS and in-app interactive walkthroughs.</li>
+            </ul>
+          </div>
+
+          <div style="background: rgba(16, 185, 129, 0.08); border-left: 4px solid #10b981; padding: 1.25rem; border-radius: 0.6rem;">
+            <h3 style="color: #34d399; font-size: 1.1rem; margin-bottom: 0.4rem;">3. Champions & VIP Loyalists: Platinum Loyalty Preservation</h3>
+            <p style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 0.6rem;">
+              <strong>Trigger:</strong> Tenure &ge;36 months, ARPU &ge;$70/mo, churn risk &lt;25%.
+            </p>
+            <ul style="font-size: 0.86rem; color: var(--text-muted); margin-left: 1.5rem; line-height: 1.6;">
+              <li><strong>Loyalty Perks:</strong> Priority routing in support queue (skip-the-line), complimentary router hardware refresh every 24 months.</li>
+              <li><strong>Advocacy:</strong> Two-way referral incentive ($25 credit for both referrer and referred subscriber).</li>
+              <li><strong>Goal:</strong> Maintain zero-churn stability and defend against fiber competitor poaching.</li>
+            </ul>
+          </div>
+
+          <div style="background: rgba(168, 85, 247, 0.08); border-left: 4px solid #a855f7; padding: 1.25rem; border-radius: 0.6rem;">
+            <h3 style="color: #c084fc; font-size: 1.1rem; margin-bottom: 0.4rem;">4. Digital Enthusiasts & Streamers: Bandwidth Expansion & Entertainment Bundles</h3>
+            <p style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 0.6rem;">
+              <strong>Trigger:</strong> High streaming activity on Fiber optic internet.
+            </p>
+            <ul style="font-size: 0.86rem; color: var(--text-muted); margin-left: 1.5rem; line-height: 1.6;">
+              <li><strong>Perks:</strong> Complimentary Gigabit speed boost for 6 months upon contract extension.</li>
+              <li><strong>Cross-Sell:</strong> Discounted streaming ecosystem bundle (Device Protection + Cloud DVR + Backup).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2026 Telecom Customer Churn Prediction & Lifetime Value (LTV) Engine | Week 4 Day 3 Milestone</p>
+      <p style="margin-top: 0.35rem; font-size: 0.78rem; color: #64748b;">
+        Generated automatically with Python, Scikit-Learn, Pandas, Seaborn & Matplotlib. Data: 7,043 Accounts.
+      </p>
+    </footer>
+  </div>
+
+  <!-- Interactive JavaScript Engine -->
+  <script>
+    const customerData = [{"id": "3298-QEICA", "tenure": 23, "contract": "Two year", "charges": 34.6, "prob": 0.0209, "tier": "Low Risk", "ltv": 834.96, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 48.9}, {"id": "7634-WSWDB", "tenure": 8, "contract": "Month-to-month", "charges": 38.5, "prob": 0.3147, "tier": "Medium Risk", "ltv": 318.75, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 27.3}, {"id": "3486-KHMLI", "tenure": 21, "contract": "Month-to-month", "charges": 24.7, "prob": 0.0612, "tier": "Low Risk", "ltv": 495.49, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 41.2}, {"id": "0422-OHQHQ", "tenure": 15, "contract": "One year", "charges": 20.55, "prob": 0.0285, "tier": "Low Risk", "ltv": 303.71, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 41.0}, {"id": "6128-AQBMT", "tenure": 41, "contract": "Month-to-month", "charges": 53.95, "prob": 0.3669, "tier": "Medium Risk", "ltv": 2234.17, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 42.9}, {"id": "0666-UXTJO", "tenure": 34, "contract": "Month-to-month", "charges": 85.2, "prob": 0.2603, "tier": "Medium Risk", "ltv": 2910.75, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 54.9}, {"id": "8450-JOVAH", "tenure": 2, "contract": "Month-to-month", "charges": 56.7, "prob": 0.2555, "tier": "Medium Risk", "ltv": 110.18, "persona": "Core Steady Subscribers", "cluster": "Cluster A", "rfm": 29.0}, {"id": "3594-KADLU", "tenure": 3, "contract": "Month-to-month", "charges": 35.1, "prob": 0.3204, "tier": "Medium Risk", "ltv": 107.57, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 23.4}, {"id": "2876-VBBBL", "tenure": 1, "contract": "Month-to-month", "charges": 20.25, "prob": 0.3374, "tier": "Medium Risk", "ltv": 20.25, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 15.4}, {"id": "4701-AHWMW", "tenure": 55, "contract": "Month-to-month", "charges": 54.55, "prob": 0.1938, "tier": "Low Risk", "ltv": 3000.69, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 52.6}, {"id": "7016-BPGEU", "tenure": 29, "contract": "Month-to-month", "charges": 25.1, "prob": 0.4976, "tier": "High Risk", "ltv": 728.65, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 31.4}, {"id": "3345-JHUEO", "tenure": 4, "contract": "Month-to-month", "charges": 20.2, "prob": 0.2169, "tier": "Low Risk", "ltv": 73.59, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 22.6}, {"id": "9972-NKTFD", "tenure": 28, "contract": "Month-to-month", "charges": 54.65, "prob": 0.0734, "tier": "Low Risk", "ltv": 1532.14, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 49.4}, {"id": "2542-HYGIQ", "tenure": 1, "contract": "Month-to-month", "charges": 19.95, "prob": 0.2473, "tier": "Low Risk", "ltv": 19.94, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 16.3}, {"id": "4673-KKSLS", "tenure": 31, "contract": "Month-to-month", "charges": 87.6, "prob": 0.1512, "tier": "Low Risk", "ltv": 2704.99, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 58.8}, {"id": "1666-JZPZT", "tenure": 27, "contract": "Month-to-month", "charges": 49.0, "prob": 0.1645, "tier": "Low Risk", "ltv": 1311.0, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 42.5}, {"id": "4718-DHSMV", "tenure": 11, "contract": "Month-to-month", "charges": 35.8, "prob": 0.3682, "tier": "Medium Risk", "ltv": 383.65, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 27.8}, {"id": "1324-NLTJE", "tenure": 15, "contract": "Month-to-month", "charges": 55.0, "prob": 0.4145, "tier": "Medium Risk", "ltv": 760.63, "persona": "Core Steady Subscribers", "cluster": "Cluster A", "rfm": 33.2}, {"id": "5840-NVDCG", "tenure": 16, "contract": "Two year", "charges": 68.25, "prob": 0.0173, "tier": "Low Risk", "ltv": 1103.89, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 54.5}, {"id": "3629-WEAAM", "tenure": 8, "contract": "Month-to-month", "charges": 64.1, "prob": 0.1712, "tier": "Low Risk", "ltv": 517.88, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 38.0}, {"id": "4208-UFFGW", "tenure": 2, "contract": "Month-to-month", "charges": 44.95, "prob": 0.3983, "tier": "Medium Risk", "ltv": 90.17, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 22.1}, {"id": "7113-HIPFI", "tenure": 66, "contract": "Two year", "charges": 65.85, "prob": 0.0042, "tier": "Low Risk", "ltv": 4286.61, "persona": "Core Steady Subscribers", "cluster": "Cluster B", "rfm": 75.8}, {"id": "7964-VEXDG", "tenure": 21, "contract": "Month-to-month", "charges": 80.35, "prob": 0.1981, "tier": "Low Risk", "ltv": 1711.28, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 49.9}, {"id": "7776-QWNFX", "tenure": 30, "contract": "Month-to-month", "charges": 50.4, "prob": 0.42, "tier": "Medium Risk", "ltv": 1539.54, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 37.5}, {"id": "5384-ZTTWP", "tenure": 15, "contract": "Month-to-month", "charges": 19.8, "prob": 0.0572, "tier": "Low Risk", "ltv": 294.06, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 34.9}, {"id": "6728-WYQBC", "tenure": 1, "contract": "Month-to-month", "charges": 20.95, "prob": 0.1903, "tier": "Low Risk", "ltv": 20.95, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 21.1}, {"id": "8167-GJLRN", "tenure": 3, "contract": "Month-to-month", "charges": 30.4, "prob": 0.2754, "tier": "Medium Risk", "ltv": 90.17, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 24.1}, {"id": "3780-YVMFA", "tenure": 8, "contract": "Month-to-month", "charges": 68.55, "prob": 0.3907, "tier": "Medium Risk", "ltv": 548.22, "persona": "Core Steady Subscribers", "cluster": "Cluster A", "rfm": 33.1}, {"id": "2520-SGTTA", "tenure": 0, "contract": "Two year", "charges": 20.0, "prob": 0.0183, "tier": "Low Risk", "ltv": 0.0, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 28.8}, {"id": "5397-NSKQG", "tenure": 67, "contract": "Two year", "charges": 50.9, "prob": 0.017, "tier": "Low Risk", "ltv": 3310.61, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 68.3}, {"id": "8100-HZZLJ", "tenure": 43, "contract": "Month-to-month", "charges": 63.95, "prob": 0.0744, "tier": "Low Risk", "ltv": 2748.14, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 56.6}, {"id": "1796-JANOW", "tenure": 2, "contract": "Month-to-month", "charges": 19.95, "prob": 0.1232, "tier": "Low Risk", "ltv": 39.93, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 23.3}, {"id": "0303-WMMRN", "tenure": 5, "contract": "Month-to-month", "charges": 19.25, "prob": 0.155, "tier": "Low Risk", "ltv": 93.49, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 22.1}, {"id": "9773-PEQBZ", "tenure": 10, "contract": "Month-to-month", "charges": 79.85, "prob": 0.4159, "tier": "Medium Risk", "ltv": 794.9, "persona": "Core Steady Subscribers", "cluster": "Cluster A", "rfm": 39.1}, {"id": "0486-LGCCH", "tenure": 11, "contract": "Two year", "charges": 19.65, "prob": 0.0214, "tier": "Low Risk", "ltv": 217.13, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 36.7}, {"id": "2911-WDXMV", "tenure": 18, "contract": "Month-to-month", "charges": 80.55, "prob": 0.3961, "tier": "Medium Risk", "ltv": 1439.28, "persona": "Core Steady Subscribers", "cluster": "Cluster A", "rfm": 43.9}, {"id": "8356-WUAOJ", "tenure": 1, "contract": "Month-to-month", "charges": 45.0, "prob": 0.3637, "tier": "Medium Risk", "ltv": 44.97, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 20.7}, {"id": "1925-LFCZZ", "tenure": 55, "contract": "One year", "charges": 50.05, "prob": 0.1408, "tier": "Low Risk", "ltv": 2735.71, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 53.4}, {"id": "2928-HLDBA", "tenure": 6, "contract": "Month-to-month", "charges": 20.7, "prob": 0.1091, "tier": "Low Risk", "ltv": 123.91, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 29.9}, {"id": "8189-XRIKE", "tenure": 32, "contract": "Month-to-month", "charges": 90.95, "prob": 0.3133, "tier": "Medium Risk", "ltv": 2907.86, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 55.6}, {"id": "0323-XWWTN", "tenure": 3, "contract": "Two year", "charges": 26.4, "prob": 0.0502, "tier": "Low Risk", "ltv": 92.79, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 33.9}, {"id": "4422-QVIJA", "tenure": 35, "contract": "Month-to-month", "charges": 50.15, "prob": 0.1099, "tier": "Low Risk", "ltv": 1720.01, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 48.5}, {"id": "3780-DDGSE", "tenure": 35, "contract": "Month-to-month", "charges": 76.05, "prob": 0.156, "tier": "Low Risk", "ltv": 2759.4, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 54.9}, {"id": "9800-ONTFE", "tenure": 22, "contract": "Month-to-month", "charges": 75.8, "prob": 0.2658, "tier": "Medium Risk", "ltv": 1607.86, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 46.2}, {"id": "8048-DSDFQ", "tenure": 1, "contract": "Month-to-month", "charges": 20.2, "prob": 0.2571, "tier": "Medium Risk", "ltv": 20.2, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 17.1}, {"id": "2364-UFROM", "tenure": 30, "contract": "One year", "charges": 70.4, "prob": 0.041, "tier": "Low Risk", "ltv": 2088.56, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 57.6}, {"id": "7054-DMVAS", "tenure": 54, "contract": "Two year", "charges": 65.3, "prob": 0.0169, "tier": "Low Risk", "ltv": 3510.63, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 67.4}, {"id": "7968-QUXNS", "tenure": 6, "contract": "Month-to-month", "charges": 18.95, "prob": 0.1137, "tier": "Low Risk", "ltv": 115.1, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 24.3}, {"id": "7492-TAFJD", "tenure": 7, "contract": "Two year", "charges": 38.55, "prob": 0.0553, "tier": "Low Risk", "ltv": 271.8, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 37.4}, {"id": "3594-IVHJZ", "tenure": 2, "contract": "Month-to-month", "charges": 20.45, "prob": 0.2059, "tier": "Low Risk", "ltv": 40.9, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 21.8}, {"id": "2070-XYMFH", "tenure": 23, "contract": "Month-to-month", "charges": 79.35, "prob": 0.3103, "tier": "Medium Risk", "ltv": 1853.8, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 46.6}, {"id": "0975-VOOVL", "tenure": 3, "contract": "Month-to-month", "charges": 29.2, "prob": 0.3231, "tier": "Medium Risk", "ltv": 92.34, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 22.7}, {"id": "5307-UVGNB", "tenure": 53, "contract": "Month-to-month", "charges": 48.7, "prob": 0.0937, "tier": "Low Risk", "ltv": 2465.38, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 54.5}, {"id": "7049-GKVZY", "tenure": 17, "contract": "One year", "charges": 79.85, "prob": 0.0669, "tier": "Low Risk", "ltv": 1368.17, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 54.2}, {"id": "9931-DCEZH", "tenure": 28, "contract": "One year", "charges": 54.4, "prob": 0.0393, "tier": "Low Risk", "ltv": 1523.0, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 52.3}, {"id": "6510-UPNKS", "tenure": 23, "contract": "One year", "charges": 24.8, "prob": 0.0323, "tier": "Low Risk", "ltv": 592.7, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 45.2}, {"id": "0315-LVCRK", "tenure": 11, "contract": "Month-to-month", "charges": 84.8, "prob": 0.4191, "tier": "Medium Risk", "ltv": 914.82, "persona": "Core Steady Subscribers", "cluster": "Cluster A", "rfm": 42.0}, {"id": "9013-AQORL", "tenure": 48, "contract": "Month-to-month", "charges": 45.55, "prob": 0.0937, "tier": "Low Risk", "ltv": 2174.18, "persona": "Core Steady Subscribers", "cluster": "Cluster D", "rfm": 52.3}, {"id": "1453-RZFON", "tenure": 1, "contract": "Month-to-month", "charges": 49.9, "prob": 0.127, "tier": "Low Risk", "ltv": 49.9, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 29.4}, {"id": "6696-YDAYZ", "tenure": 16, "contract": "Two year", "charges": 20.5, "prob": 0.0134, "tier": "Low Risk", "ltv": 322.86, "persona": "Core Steady Subscribers", "cluster": "Cluster C", "rfm": 44.2}, {"id": "4797-AXPXK", "tenure": 1, "contract": "Month-to-month", "charges": 60.0, "prob": 0.4861, "tier": "High Risk", "ltv": 60.54, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 23.0}, {"id": "4988-IQIGL", "tenure": 1, "contract": "Month-to-month", "charges": 75.35, "prob": 0.8508, "tier": "Critical Risk", "ltv": 75.33, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 22.0}, {"id": "5356-RHIPP", "tenure": 1, "contract": "Month-to-month", "charges": 20.2, "prob": 0.5109, "tier": "High Risk", "ltv": 20.2, "persona": "Vulnerable Newcomers", "cluster": "Cluster C", "rfm": 12.1}, {"id": "9633-XQABV", "tenure": 3, "contract": "Month-to-month", "charges": 70.25, "prob": 0.5041, "tier": "High Risk", "ltv": 223.99, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 28.8}, {"id": "8266-VBFQL", "tenure": 4, "contract": "Month-to-month", "charges": 90.4, "prob": 0.6892, "tier": "High Risk", "ltv": 359.63, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 36.0}, {"id": "0151-ONTOV", "tenure": 1, "contract": "Month-to-month", "charges": 70.9, "prob": 0.7199, "tier": "Critical Risk", "ltv": 70.88, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 22.6}, {"id": "8739-XNIKG", "tenure": 5, "contract": "Month-to-month", "charges": 84.0, "prob": 0.8159, "tier": "Critical Risk", "ltv": 421.93, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 31.1}, {"id": "2725-KXXWT", "tenure": 1, "contract": "Month-to-month", "charges": 90.75, "prob": 0.8656, "tier": "Critical Risk", "ltv": 90.69, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 28.8}, {"id": "7963-GQRMY", "tenure": 3, "contract": "Month-to-month", "charges": 44.3, "prob": 0.5295, "tier": "High Risk", "ltv": 134.66, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 20.6}, {"id": "9878-TNQGW", "tenure": 2, "contract": "Month-to-month", "charges": 80.95, "prob": 0.7881, "tier": "Critical Risk", "ltv": 161.33, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 28.1}, {"id": "7439-DKZTW", "tenure": 1, "contract": "Month-to-month", "charges": 80.55, "prob": 0.6607, "tier": "High Risk", "ltv": 80.66, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 27.9}, {"id": "4871-JTKJF", "tenure": 1, "contract": "Month-to-month", "charges": 69.65, "prob": 0.8816, "tier": "Critical Risk", "ltv": 69.65, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 18.6}, {"id": "9306-CPCBC", "tenure": 3, "contract": "Month-to-month", "charges": 74.25, "prob": 0.8418, "tier": "Critical Risk", "ltv": 220.74, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 24.3}, {"id": "4587-NUKOX", "tenure": 3, "contract": "Month-to-month", "charges": 79.1, "prob": 0.6946, "tier": "High Risk", "ltv": 240.92, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 29.3}, {"id": "1143-NMNQJ", "tenure": 2, "contract": "Month-to-month", "charges": 85.7, "prob": 0.8334, "tier": "Critical Risk", "ltv": 171.11, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 29.3}, {"id": "0685-MLYYM", "tenure": 2, "contract": "Month-to-month", "charges": 70.75, "prob": 0.7013, "tier": "Critical Risk", "ltv": 144.05, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 24.9}, {"id": "4702-IOQDC", "tenure": 1, "contract": "Month-to-month", "charges": 70.1, "prob": 0.7756, "tier": "Critical Risk", "ltv": 70.1, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 20.9}, {"id": "1981-INRFU", "tenure": 2, "contract": "Month-to-month", "charges": 79.75, "prob": 0.8327, "tier": "Critical Risk", "ltv": 161.42, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 26.2}, {"id": "0723-DRCLG", "tenure": 1, "contract": "Month-to-month", "charges": 74.45, "prob": 0.8837, "tier": "Critical Risk", "ltv": 74.39, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 20.7}, {"id": "3908-BLSYF", "tenure": 6, "contract": "Month-to-month", "charges": 83.9, "prob": 0.666, "tier": "High Risk", "ltv": 505.42, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 34.5}, {"id": "2135-DQWAQ", "tenure": 5, "contract": "Month-to-month", "charges": 85.3, "prob": 0.4279, "tier": "Medium Risk", "ltv": 421.0, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 38.7}, {"id": "7594-RQHXR", "tenure": 1, "contract": "Month-to-month", "charges": 79.6, "prob": 0.8372, "tier": "Critical Risk", "ltv": 79.64, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 23.9}, {"id": "7881-EVUAD", "tenure": 2, "contract": "Month-to-month", "charges": 42.6, "prob": 0.5335, "tier": "High Risk", "ltv": 79.4, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 19.2}, {"id": "5729-KLZAR", "tenure": 4, "contract": "Month-to-month", "charges": 80.85, "prob": 0.7574, "tier": "Critical Risk", "ltv": 319.69, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 30.5}, {"id": "3066-RRJIO", "tenure": 1, "contract": "Month-to-month", "charges": 69.95, "prob": 0.7618, "tier": "Critical Risk", "ltv": 69.95, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 21.0}, {"id": "1582-RAFML", "tenure": 1, "contract": "Month-to-month", "charges": 60.1, "prob": 0.4991, "tier": "High Risk", "ltv": 60.67, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 22.9}, {"id": "4959-JOSRX", "tenure": 2, "contract": "Month-to-month", "charges": 44.6, "prob": 0.5411, "tier": "High Risk", "ltv": 88.37, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 19.4}, {"id": "9095-HFAFX", "tenure": 5, "contract": "Month-to-month", "charges": 81.0, "prob": 0.7681, "tier": "Critical Risk", "ltv": 395.45, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 31.2}, {"id": "8372-JUXUI", "tenure": 1, "contract": "Month-to-month", "charges": 74.35, "prob": 0.8009, "tier": "Critical Risk", "ltv": 74.35, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 22.1}, {"id": "4236-XPXAV", "tenure": 5, "contract": "Month-to-month", "charges": 99.15, "prob": 0.7053, "tier": "Critical Risk", "ltv": 486.27, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 39.9}, {"id": "2462-XIIJB", "tenure": 5, "contract": "Month-to-month", "charges": 92.5, "prob": 0.8612, "tier": "Critical Risk", "ltv": 468.13, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 34.3}, {"id": "0411-EZJZE", "tenure": 3, "contract": "Month-to-month", "charges": 60.25, "prob": 0.4292, "tier": "Medium Risk", "ltv": 176.16, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 27.2}, {"id": "8873-GLDMH", "tenure": 6, "contract": "Month-to-month", "charges": 73.85, "prob": 0.7123, "tier": "Critical Risk", "ltv": 428.0, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 28.9}, {"id": "0923-PNFUB", "tenure": 3, "contract": "Month-to-month", "charges": 83.75, "prob": 0.654, "tier": "High Risk", "ltv": 251.55, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 32.3}, {"id": "7321-VGNKU", "tenure": 2, "contract": "Month-to-month", "charges": 70.35, "prob": 0.5161, "tier": "High Risk", "ltv": 138.35, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 27.6}, {"id": "1449-XQEMT", "tenure": 3, "contract": "Month-to-month", "charges": 19.8, "prob": 0.4414, "tier": "Medium Risk", "ltv": 59.44, "persona": "Vulnerable Newcomers", "cluster": "Cluster C", "rfm": 14.7}, {"id": "9408-SSNVZ", "tenure": 4, "contract": "Month-to-month", "charges": 70.15, "prob": 0.8003, "tier": "Critical Risk", "ltv": 278.32, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 24.7}, {"id": "3186-BAXNB", "tenure": 1, "contract": "Month-to-month", "charges": 91.7, "prob": 0.7781, "tier": "Critical Risk", "ltv": 92.42, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 30.8}, {"id": "1447-GIQMR", "tenure": 1, "contract": "Month-to-month", "charges": 69.15, "prob": 0.8301, "tier": "Critical Risk", "ltv": 69.16, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 19.2}, {"id": "3538-WZPHD", "tenure": 3, "contract": "Month-to-month", "charges": 29.6, "prob": 0.703, "tier": "Critical Risk", "ltv": 83.78, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 16.3}, {"id": "3158-MOERK", "tenure": 2, "contract": "Month-to-month", "charges": 96.0, "prob": 0.8994, "tier": "Critical Risk", "ltv": 188.21, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 32.9}, {"id": "8617-ENBDS", "tenure": 3, "contract": "Month-to-month", "charges": 73.6, "prob": 0.4289, "tier": "Medium Risk", "ltv": 223.99, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 31.1}, {"id": "7577-SWIFR", "tenure": 1, "contract": "Month-to-month", "charges": 89.25, "prob": 0.5972, "tier": "High Risk", "ltv": 89.22, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 32.4}, {"id": "4844-JJWUY", "tenure": 1, "contract": "Month-to-month", "charges": 86.0, "prob": 0.831, "tier": "Critical Risk", "ltv": 86.88, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 27.4}, {"id": "7409-KIUTL", "tenure": 1, "contract": "Month-to-month", "charges": 71.0, "prob": 0.7395, "tier": "Critical Risk", "ltv": 71.0, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 22.3}, {"id": "5760-IFJOZ", "tenure": 3, "contract": "Month-to-month", "charges": 107.95, "prob": 0.5605, "tier": "High Risk", "ltv": 323.29, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 43.8}, {"id": "4636-QRJKY", "tenure": 6, "contract": "Month-to-month", "charges": 80.5, "prob": 0.7372, "tier": "Critical Risk", "ltv": 488.55, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 32.0}, {"id": "7295-JOMMD", "tenure": 4, "contract": "Month-to-month", "charges": 98.1, "prob": 0.7196, "tier": "Critical Risk", "ltv": 393.9, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 38.5}, {"id": "5047-LHVLY", "tenure": 1, "contract": "Month-to-month", "charges": 50.15, "prob": 0.4611, "tier": "High Risk", "ltv": 50.14, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 20.4}, {"id": "7384-GHBPI", "tenure": 3, "contract": "Month-to-month", "charges": 35.15, "prob": 0.8093, "tier": "Critical Risk", "ltv": 102.06, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 14.9}, {"id": "1624-NALOJ", "tenure": 5, "contract": "Month-to-month", "charges": 89.8, "prob": 0.8707, "tier": "Critical Risk", "ltv": 469.82, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 33.0}, {"id": "6876-ADESB", "tenure": 1, "contract": "Month-to-month", "charges": 48.95, "prob": 0.5818, "tier": "High Risk", "ltv": 48.96, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 17.8}, {"id": "2672-HUYVI", "tenure": 6, "contract": "Month-to-month", "charges": 91.1, "prob": 0.8393, "tier": "Critical Risk", "ltv": 508.58, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 35.0}, {"id": "5119-NZPTV", "tenure": 2, "contract": "Month-to-month", "charges": 70.1, "prob": 0.488, "tier": "High Risk", "ltv": 139.77, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 27.9}, {"id": "3988-RQIXO", "tenure": 1, "contract": "Month-to-month", "charges": 91.3, "prob": 0.8747, "tier": "Critical Risk", "ltv": 91.64, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 29.0}, {"id": "9300-AGZNL", "tenure": 1, "contract": "Month-to-month", "charges": 94.0, "prob": 0.9185, "tier": "Critical Risk", "ltv": 94.53, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 29.4}, {"id": "4234-XTNEA", "tenure": 2, "contract": "Month-to-month", "charges": 79.95, "prob": 0.5499, "tier": "High Risk", "ltv": 164.27, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 31.2}, {"id": "7245-NIIWQ", "tenure": 3, "contract": "Month-to-month", "charges": 69.85, "prob": 0.5152, "tier": "High Risk", "ltv": 201.67, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 28.3}, {"id": "0793-TWELN", "tenure": 4, "contract": "Month-to-month", "charges": 80.15, "prob": 0.4515, "tier": "High Risk", "ltv": 322.22, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 35.0}, {"id": "0021-IKXGC", "tenure": 1, "contract": "Month-to-month", "charges": 72.1, "prob": 0.606, "tier": "High Risk", "ltv": 72.0, "persona": "Vulnerable Newcomers", "cluster": "Cluster A", "rfm": 24.6}, {"id": "3249-VHRIP", "tenure": 62, "contract": "Two year", "charges": 43.6, "prob": 0.0361, "tier": "Low Risk", "ltv": 2723.34, "persona": "Budget Anchors", "cluster": "Cluster D", "rfm": 60.8}, {"id": "2050-ONYDQ", "tenure": 65, "contract": "Two year", "charges": 26.0, "prob": 0.0054, "tier": "Low Risk", "ltv": 1689.73, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 66.8}, {"id": "9891-NQDBD", "tenure": 28, "contract": "One year", "charges": 25.55, "prob": 0.0354, "tier": "Low Risk", "ltv": 703.71, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 47.7}, {"id": "4709-LKHYG", "tenure": 29, "contract": "One year", "charges": 20.0, "prob": 0.0304, "tier": "Low Risk", "ltv": 572.31, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 44.2}, {"id": "1934-MKPXS", "tenure": 33, "contract": "One year", "charges": 20.1, "prob": 0.0303, "tier": "Low Risk", "ltv": 650.88, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 46.1}, {"id": "5918-VUKWP", "tenure": 32, "contract": "One year", "charges": 20.55, "prob": 0.0209, "tier": "Low Risk", "ltv": 649.8, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 48.8}, {"id": "6770-UAYGJ", "tenure": 49, "contract": "Two year", "charges": 25.25, "prob": 0.0106, "tier": "Low Risk", "ltv": 1198.72, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 58.8}, {"id": "2560-QTSBS", "tenure": 72, "contract": "One year", "charges": 23.3, "prob": 0.0134, "tier": "Low Risk", "ltv": 1676.15, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 66.7}, {"id": "1591-XWLGB", "tenure": 71, "contract": "Two year", "charges": 19.85, "prob": 0.004, "tier": "Low Risk", "ltv": 1409.33, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 65.1}, {"id": "2073-QBVBI", "tenure": 41, "contract": "One year", "charges": 35.45, "prob": 0.039, "tier": "Low Risk", "ltv": 1449.55, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 52.6}, {"id": "7980-MHFLQ", "tenure": 72, "contract": "Two year", "charges": 24.9, "prob": 0.0045, "tier": "Low Risk", "ltv": 1792.05, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 70.6}, {"id": "3097-FQTVJ", "tenure": 41, "contract": "Two year", "charges": 20.0, "prob": 0.0075, "tier": "Low Risk", "ltv": 819.41, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 53.1}, {"id": "5171-EPLKN", "tenure": 27, "contract": "Two year", "charges": 19.85, "prob": 0.0123, "tier": "Low Risk", "ltv": 513.77, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 46.4}, {"id": "0621-CXBKL", "tenure": 53, "contract": "Two year", "charges": 18.7, "prob": 0.0082, "tier": "Low Risk", "ltv": 1004.18, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 53.7}, {"id": "3893-JRNFS", "tenure": 68, "contract": "Month-to-month", "charges": 39.9, "prob": 0.1633, "tier": "Low Risk", "ltv": 2736.95, "persona": "Budget Anchors", "cluster": "Cluster D", "rfm": 54.9}, {"id": "1302-TPUBN", "tenure": 66, "contract": "Two year", "charges": 19.35, "prob": 0.0048, "tier": "Low Risk", "ltv": 1264.17, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 60.3}, {"id": "0281-CNTZX", "tenure": 63, "contract": "Two year", "charges": 19.95, "prob": 0.008, "tier": "Low Risk", "ltv": 1252.27, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 60.1}, {"id": "1574-DYCWE", "tenure": 51, "contract": "Two year", "charges": 19.95, "prob": 0.0074, "tier": "Low Risk", "ltv": 1018.77, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 56.2}, {"id": "2068-WWXQZ", "tenure": 46, "contract": "Two year", "charges": 20.05, "prob": 0.006, "tier": "Low Risk", "ltv": 915.09, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 55.5}, {"id": "0374-FIUCA", "tenure": 65, "contract": "Two year", "charges": 20.4, "prob": 0.0073, "tier": "Low Risk", "ltv": 1407.04, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 63.0}, {"id": "8896-RAZCR", "tenure": 44, "contract": "Two year", "charges": 19.9, "prob": 0.0054, "tier": "Low Risk", "ltv": 854.87, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 54.4}, {"id": "9945-PSVIP", "tenure": 25, "contract": "Two year", "charges": 18.7, "prob": 0.0108, "tier": "Low Risk", "ltv": 409.63, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 43.5}, {"id": "5845-BZZIB", "tenure": 35, "contract": "Two year", "charges": 20.1, "prob": 0.0082, "tier": "Low Risk", "ltv": 682.8, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 51.5}, {"id": "9385-EHGDO", "tenure": 35, "contract": "Two year", "charges": 19.85, "prob": 0.0113, "tier": "Low Risk", "ltv": 705.94, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 49.4}, {"id": "4530-NDRKU", "tenure": 42, "contract": "One year", "charges": 19.05, "prob": 0.0272, "tier": "Low Risk", "ltv": 780.02, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 46.0}, {"id": "7636-PEPNS", "tenure": 58, "contract": "One year", "charges": 44.1, "prob": 0.0526, "tier": "Low Risk", "ltv": 2515.69, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 57.8}, {"id": "0203-HHYIJ", "tenure": 25, "contract": "One year", "charges": 25.3, "prob": 0.1715, "tier": "Low Risk", "ltv": 652.1, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 38.0}, {"id": "7758-UJWYS", "tenure": 34, "contract": "Two year", "charges": 40.55, "prob": 0.0576, "tier": "Low Risk", "ltv": 1379.48, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 49.1}, {"id": "1074-WVEVG", "tenure": 59, "contract": "One year", "charges": 20.35, "prob": 0.0143, "tier": "Low Risk", "ltv": 1218.39, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 58.5}, {"id": "4795-UXVCJ", "tenure": 26, "contract": "One year", "charges": 19.8, "prob": 0.027, "tier": "Low Risk", "ltv": 512.04, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 42.8}, {"id": "7061-OVMIM", "tenure": 30, "contract": "One year", "charges": 19.55, "prob": 0.0199, "tier": "Low Risk", "ltv": 586.49, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 44.5}, {"id": "9624-EGDEQ", "tenure": 37, "contract": "Two year", "charges": 19.8, "prob": 0.0087, "tier": "Low Risk", "ltv": 810.24, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 50.6}, {"id": "2324-AALNO", "tenure": 48, "contract": "One year", "charges": 24.55, "prob": 0.0159, "tier": "Low Risk", "ltv": 1207.22, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 56.2}, {"id": "6174-NRBTZ", "tenure": 46, "contract": "One year", "charges": 30.75, "prob": 0.0428, "tier": "Low Risk", "ltv": 1436.28, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 53.4}, {"id": "6551-VLJMV", "tenure": 34, "contract": "Two year", "charges": 20.05, "prob": 0.0097, "tier": "Low Risk", "ltv": 675.29, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 50.4}, {"id": "3359-DSRKA", "tenure": 58, "contract": "Two year", "charges": 19.85, "prob": 0.008, "tier": "Low Risk", "ltv": 1152.38, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 57.9}, {"id": "6485-QXWWE", "tenure": 62, "contract": "Two year", "charges": 26.0, "prob": 0.0058, "tier": "Low Risk", "ltv": 1610.49, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 65.6}, {"id": "9646-NMHXE", "tenure": 47, "contract": "Two year", "charges": 19.65, "prob": 0.0064, "tier": "Low Risk", "ltv": 928.68, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 54.0}, {"id": "1657-DYMBM", "tenure": 53, "contract": "Two year", "charges": 19.9, "prob": 0.008, "tier": "Low Risk", "ltv": 1103.19, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 56.4}, {"id": "6976-BWGLQ", "tenure": 72, "contract": "Two year", "charges": 25.2, "prob": 0.0042, "tier": "Low Risk", "ltv": 1771.53, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 71.1}, {"id": "4518-FZBSX", "tenure": 42, "contract": "One year", "charges": 20.25, "prob": 0.0131, "tier": "Low Risk", "ltv": 851.31, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 52.8}, {"id": "7696-CFTAT", "tenure": 37, "contract": "Two year", "charges": 19.8, "prob": 0.007, "tier": "Low Risk", "ltv": 735.06, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 51.3}, {"id": "8958-JPTRR", "tenure": 56, "contract": "One year", "charges": 24.3, "prob": 0.0299, "tier": "Low Risk", "ltv": 1321.97, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 56.3}, {"id": "6340-DACFT", "tenure": 50, "contract": "Two year", "charges": 20.55, "prob": 0.0071, "tier": "Low Risk", "ltv": 1036.73, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 58.2}, {"id": "6855-VLGOS", "tenure": 72, "contract": "Two year", "charges": 20.55, "prob": 0.0047, "tier": "Low Risk", "ltv": 1467.48, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 68.8}, {"id": "5549-ZGHFB", "tenure": 50, "contract": "Two year", "charges": 24.95, "prob": 0.0106, "tier": "Low Risk", "ltv": 1253.6, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 58.6}, {"id": "6527-PZFPV", "tenure": 24, "contract": "One year", "charges": 20.8, "prob": 0.0241, "tier": "Low Risk", "ltv": 490.36, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 45.8}, {"id": "8319-QBEHW", "tenure": 26, "contract": "One year", "charges": 39.95, "prob": 0.1236, "tier": "Low Risk", "ltv": 1033.48, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 42.3}, {"id": "6961-MJKBO", "tenure": 47, "contract": "Two year", "charges": 20.45, "prob": 0.0057, "tier": "Low Risk", "ltv": 952.53, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 57.5}, {"id": "8241-JUIQO", "tenure": 61, "contract": "One year", "charges": 19.45, "prob": 0.0125, "tier": "Low Risk", "ltv": 1314.57, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 56.1}, {"id": "3642-BYHDO", "tenure": 71, "contract": "Two year", "charges": 19.9, "prob": 0.0032, "tier": "Low Risk", "ltv": 1413.06, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 65.5}, {"id": "9504-YAZWB", "tenure": 53, "contract": "Two year", "charges": 20.25, "prob": 0.008, "tier": "Low Risk", "ltv": 1059.66, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 57.9}, {"id": "3594-BDSOA", "tenure": 24, "contract": "One year", "charges": 20.4, "prob": 0.0329, "tier": "Low Risk", "ltv": 485.34, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 43.6}, {"id": "2428-HYUNX", "tenure": 44, "contract": "Two year", "charges": 19.35, "prob": 0.0114, "tier": "Low Risk", "ltv": 852.98, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 50.3}, {"id": "2097-YVPKN", "tenure": 65, "contract": "Two year", "charges": 25.75, "prob": 0.0071, "tier": "Low Risk", "ltv": 1694.91, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 66.1}, {"id": "4310-KEDTB", "tenure": 26, "contract": "Month-to-month", "charges": 29.8, "prob": 0.1808, "tier": "Low Risk", "ltv": 774.72, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 38.8}, {"id": "9548-LERKT", "tenure": 24, "contract": "Two year", "charges": 19.75, "prob": 0.0119, "tier": "Low Risk", "ltv": 475.94, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 44.9}, {"id": "2819-GWENI", "tenure": 28, "contract": "One year", "charges": 19.9, "prob": 0.0218, "tier": "Low Risk", "ltv": 546.61, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 44.8}, {"id": "2607-DHDAK", "tenure": 72, "contract": "Two year", "charges": 19.8, "prob": 0.0046, "tier": "Low Risk", "ltv": 1422.06, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 66.0}, {"id": "1403-GYAFU", "tenure": 70, "contract": "Two year", "charges": 20.05, "prob": 0.0034, "tier": "Low Risk", "ltv": 1390.44, "persona": "Budget Anchors", "cluster": "Cluster C", "rfm": 65.4}, {"id": "9961-JBNMK", "tenure": 21, "contract": "Month-to-month", "charges": 96.8, "prob": 0.6832, "tier": "High Risk", "ltv": 2030.42, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 47.6}, {"id": "2302-ANTDP", "tenure": 48, "contract": "Month-to-month", "charges": 117.45, "prob": 0.5165, "tier": "High Risk", "ltv": 5546.69, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 65.1}, {"id": "3143-ILDAL", "tenure": 56, "contract": "Month-to-month", "charges": 94.45, "prob": 0.539, "tier": "High Risk", "ltv": 5247.26, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 60.6}, {"id": "9898-KZQDZ", "tenure": 40, "contract": "Month-to-month", "charges": 94.55, "prob": 0.6385, "tier": "High Risk", "ltv": 3720.6, "persona": "At-Risk High Rollers", "cluster": "Cluster D", "rfm": 53.8}, {"id": "3934-HXCFZ", "tenure": 23, "contract": "Month-to-month", "charges": 99.25, "prob": 0.6738, "tier": "High Risk", "ltv": 2256.82, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 49.3}, {"id": "6394-MFYNG", "tenure": 48, "contract": "Month-to-month", "charges": 107.4, "prob": 0.6037, "tier": "High Risk", "ltv": 5144.56, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 61.9}, {"id": "1899-VXWXM", "tenure": 48, "contract": "One year", "charges": 106.1, "prob": 0.4836, "tier": "High Risk", "ltv": 5092.77, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 63.6}, {"id": "3744-ZRRDZ", "tenure": 21, "contract": "Month-to-month", "charges": 82.35, "prob": 0.6497, "tier": "High Risk", "ltv": 1779.43, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 41.7}, {"id": "8325-QRPZR", "tenure": 7, "contract": "Month-to-month", "charges": 75.15, "prob": 0.4614, "tier": "High Risk", "ltv": 528.98, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 34.6}, {"id": "9560-ARGQJ", "tenure": 16, "contract": "Month-to-month", "charges": 81.0, "prob": 0.6632, "tier": "High Risk", "ltv": 1298.65, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 39.1}, {"id": "8270-RKSAP", "tenure": 9, "contract": "Month-to-month", "charges": 70.5, "prob": 0.4697, "tier": "High Risk", "ltv": 598.78, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 33.7}, {"id": "9614-RMGHA", "tenure": 65, "contract": "Month-to-month", "charges": 91.85, "prob": 0.4978, "tier": "High Risk", "ltv": 5976.28, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 63.7}, {"id": "6771-XWBDM", "tenure": 57, "contract": "Month-to-month", "charges": 104.5, "prob": 0.6471, "tier": "High Risk", "ltv": 5951.62, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 63.4}, {"id": "6583-QGCSI", "tenure": 50, "contract": "Month-to-month", "charges": 88.05, "prob": 0.6887, "tier": "High Risk", "ltv": 4326.44, "persona": "At-Risk High Rollers", "cluster": "Cluster D", "rfm": 53.3}, {"id": "5628-FCGYG", "tenure": 21, "contract": "Month-to-month", "charges": 84.1, "prob": 0.6075, "tier": "High Risk", "ltv": 1746.26, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 42.7}, {"id": "3208-YPIOE", "tenure": 39, "contract": "Month-to-month", "charges": 75.25, "prob": 0.5543, "tier": "High Risk", "ltv": 2986.04, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 46.2}, {"id": "9600-UDOPK", "tenure": 30, "contract": "Month-to-month", "charges": 94.05, "prob": 0.7102, "tier": "Critical Risk", "ltv": 2927.26, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 49.1}, {"id": "5382-SOYZL", "tenure": 22, "contract": "Month-to-month", "charges": 95.1, "prob": 0.6836, "tier": "High Risk", "ltv": 2097.53, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 47.2}, {"id": "0895-DQHEW", "tenure": 54, "contract": "Month-to-month", "charges": 104.3, "prob": 0.7297, "tier": "Critical Risk", "ltv": 5511.14, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 60.8}, {"id": "2665-NPTGL", "tenure": 26, "contract": "Month-to-month", "charges": 98.1, "prob": 0.6276, "tier": "High Risk", "ltv": 2539.85, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 50.8}, {"id": "0135-NMXAP", "tenure": 12, "contract": "Month-to-month", "charges": 89.75, "prob": 0.7696, "tier": "Critical Risk", "ltv": 1075.93, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 38.9}, {"id": "3419-SNJJD", "tenure": 65, "contract": "Month-to-month", "charges": 105.25, "prob": 0.5038, "tier": "High Risk", "ltv": 6815.58, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 68.9}, {"id": "0564-JJHGS", "tenure": 9, "contract": "Month-to-month", "charges": 95.5, "prob": 0.8803, "tier": "Critical Risk", "ltv": 855.7, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 38.0}, {"id": "8802-UNOJF", "tenure": 12, "contract": "Month-to-month", "charges": 83.8, "prob": 0.6426, "tier": "High Risk", "ltv": 1009.25, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 38.3}, {"id": "1343-EHPYB", "tenure": 63, "contract": "Month-to-month", "charges": 103.4, "prob": 0.6806, "tier": "High Risk", "ltv": 6574.81, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 64.4}, {"id": "7529-ZDFXI", "tenure": 57, "contract": "Month-to-month", "charges": 89.85, "prob": 0.482, "tier": "High Risk", "ltv": 5033.0, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 60.1}, {"id": "5022-JNQEQ", "tenure": 9, "contract": "Month-to-month", "charges": 75.85, "prob": 0.515, "tier": "High Risk", "ltv": 671.76, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 35.5}, {"id": "4116-TZAQJ", "tenure": 9, "contract": "Month-to-month", "charges": 74.25, "prob": 0.6332, "tier": "High Risk", "ltv": 638.19, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 32.3}, {"id": "5935-FCCNB", "tenure": 17, "contract": "Month-to-month", "charges": 94.2, "prob": 0.5195, "tier": "High Risk", "ltv": 1595.46, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 47.2}, {"id": "6683-VLCTZ", "tenure": 20, "contract": "Month-to-month", "charges": 98.55, "prob": 0.7943, "tier": "Critical Risk", "ltv": 1831.32, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 45.6}, {"id": "4818-DRBQT", "tenure": 29, "contract": "Month-to-month", "charges": 80.15, "prob": 0.5794, "tier": "High Risk", "ltv": 2291.68, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 44.8}, {"id": "1833-TCXKK", "tenure": 45, "contract": "Month-to-month", "charges": 107.75, "prob": 0.4504, "tier": "High Risk", "ltv": 4877.13, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 63.5}, {"id": "5883-GTGVD", "tenure": 19, "contract": "Month-to-month", "charges": 99.95, "prob": 0.7563, "tier": "Critical Risk", "ltv": 1934.24, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 46.6}, {"id": "2856-NNASM", "tenure": 43, "contract": "Month-to-month", "charges": 89.55, "prob": 0.5841, "tier": "High Risk", "ltv": 3859.01, "persona": "At-Risk High Rollers", "cluster": "Cluster D", "rfm": 53.4}, {"id": "9090-SGQXL", "tenure": 68, "contract": "Month-to-month", "charges": 105.3, "prob": 0.6729, "tier": "High Risk", "ltv": 7208.66, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 67.6}, {"id": "2070-FNEXE", "tenure": 7, "contract": "Month-to-month", "charges": 76.45, "prob": 0.485, "tier": "High Risk", "ltv": 514.92, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 35.0}, {"id": "7780-OTDSO", "tenure": 18, "contract": "Month-to-month", "charges": 99.4, "prob": 0.7184, "tier": "Critical Risk", "ltv": 1778.94, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 46.6}, {"id": "0337-CNPZE", "tenure": 41, "contract": "Month-to-month", "charges": 106.3, "prob": 0.7103, "tier": "Critical Risk", "ltv": 4407.88, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 57.8}, {"id": "6986-IJDHX", "tenure": 39, "contract": "Month-to-month", "charges": 86.3, "prob": 0.4668, "tier": "High Risk", "ltv": 3332.32, "persona": "At-Risk High Rollers", "cluster": "Cluster D", "rfm": 53.0}, {"id": "6032-KRXXO", "tenure": 30, "contract": "Month-to-month", "charges": 90.25, "prob": 0.688, "tier": "High Risk", "ltv": 2731.52, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 48.1}, {"id": "0939-YAPAF", "tenure": 35, "contract": "Month-to-month", "charges": 100.25, "prob": 0.7139, "tier": "Critical Risk", "ltv": 3497.95, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 53.5}, {"id": "4597-NUCQV", "tenure": 24, "contract": "Month-to-month", "charges": 101.25, "prob": 0.7415, "tier": "Critical Risk", "ltv": 2454.51, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 49.6}, {"id": "1254-IZEYF", "tenure": 31, "contract": "Month-to-month", "charges": 99.95, "prob": 0.7406, "tier": "Critical Risk", "ltv": 3138.06, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 51.4}, {"id": "5293-WXJAK", "tenure": 11, "contract": "Month-to-month", "charges": 104.05, "prob": 0.8358, "tier": "Critical Risk", "ltv": 1136.58, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 42.9}, {"id": "2362-IBOOY", "tenure": 36, "contract": "Month-to-month", "charges": 84.75, "prob": 0.6717, "tier": "High Risk", "ltv": 3049.41, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 47.8}, {"id": "7279-BUYWN", "tenure": 41, "contract": "Month-to-month", "charges": 113.2, "prob": 0.4659, "tier": "High Risk", "ltv": 4652.61, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 63.2}, {"id": "2479-BRAMR", "tenure": 41, "contract": "Month-to-month", "charges": 83.75, "prob": 0.4892, "tier": "High Risk", "ltv": 3309.17, "persona": "At-Risk High Rollers", "cluster": "Cluster D", "rfm": 51.6}, {"id": "8019-ENHXU", "tenure": 42, "contract": "Month-to-month", "charges": 99.45, "prob": 0.6048, "tier": "High Risk", "ltv": 4173.71, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 56.9}, {"id": "5520-FVEWJ", "tenure": 12, "contract": "Month-to-month", "charges": 84.5, "prob": 0.7592, "tier": "Critical Risk", "ltv": 983.08, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 36.6}, {"id": "3070-DVEYC", "tenure": 7, "contract": "Month-to-month", "charges": 73.75, "prob": 0.7637, "tier": "Critical Risk", "ltv": 530.64, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 28.5}, {"id": "0581-MDMPW", "tenure": 24, "contract": "Month-to-month", "charges": 88.95, "prob": 0.4708, "tier": "High Risk", "ltv": 2111.95, "persona": "At-Risk High Rollers", "cluster": "Cluster D", "rfm": 48.4}, {"id": "6005-OBZPH", "tenure": 26, "contract": "Month-to-month", "charges": 89.15, "prob": 0.7371, "tier": "Critical Risk", "ltv": 2299.07, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 45.0}, {"id": "6646-VRFOL", "tenure": 53, "contract": "Month-to-month", "charges": 103.85, "prob": 0.7595, "tier": "Critical Risk", "ltv": 5494.6, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 59.6}, {"id": "6328-ZPBGN", "tenure": 11, "contract": "Month-to-month", "charges": 95.15, "prob": 0.8058, "tier": "Critical Risk", "ltv": 995.19, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 40.2}, {"id": "7641-EUYET", "tenure": 46, "contract": "Month-to-month", "charges": 100.7, "prob": 0.5535, "tier": "High Risk", "ltv": 4610.52, "persona": "At-Risk High Rollers", "cluster": "Cluster B", "rfm": 59.7}, {"id": "4112-LUEIZ", "tenure": 10, "contract": "Month-to-month", "charges": 89.5, "prob": 0.8285, "tier": "Critical Risk", "ltv": 880.31, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 36.6}, {"id": "0325-XBFAC", "tenure": 8, "contract": "Month-to-month", "charges": 94.7, "prob": 0.9202, "tier": "Critical Risk", "ltv": 749.08, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 36.6}, {"id": "4289-DTDKW", "tenure": 40, "contract": "Month-to-month", "charges": 101.3, "prob": 0.6712, "tier": "High Risk", "ltv": 4064.15, "persona": "At-Risk High Rollers", "cluster": "Cluster D", "rfm": 56.4}, {"id": "7278-CKDNC", "tenure": 24, "contract": "Month-to-month", "charges": 80.5, "prob": 0.4839, "tier": "High Risk", "ltv": 2027.01, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 44.8}, {"id": "6413-XKKPU", "tenure": 17, "contract": "Month-to-month", "charges": 89.4, "prob": 0.5902, "tier": "High Risk", "ltv": 1512.01, "persona": "At-Risk High Rollers", "cluster": "Cluster A", "rfm": 44.0}, {"id": "0080-OROZO", "tenure": 35, "contract": "One year", "charges": 99.25, "prob": 0.1673, "tier": "Low Risk", "ltv": 3496.0, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 64.3}, {"id": "2386-OWURY", "tenure": 58, "contract": "Month-to-month", "charges": 95.3, "prob": 0.3182, "tier": "Medium Risk", "ltv": 5624.81, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 65.9}, {"id": "2252-ISRNH", "tenure": 9, "contract": "One year", "charges": 90.35, "prob": 0.4112, "tier": "Medium Risk", "ltv": 792.9, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster A", "rfm": 43.6}, {"id": "5149-CUZUJ", "tenure": 28, "contract": "One year", "charges": 92.9, "prob": 0.0737, "tier": "Low Risk", "ltv": 2663.28, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 64.0}, {"id": "5150-LJNSR", "tenure": 31, "contract": "One year", "charges": 98.05, "prob": 0.094, "tier": "Low Risk", "ltv": 3070.78, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 66.0}, {"id": "8947-YRTDV", "tenure": 32, "contract": "One year", "charges": 94.8, "prob": 0.0653, "tier": "Low Risk", "ltv": 3134.79, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 66.8}, {"id": "6486-LHTMA", "tenure": 31, "contract": "One year", "charges": 90.7, "prob": 0.2902, "tier": "Medium Risk", "ltv": 2821.33, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 55.7}, {"id": "7048-GXDAY", "tenure": 39, "contract": "Month-to-month", "charges": 106.4, "prob": 0.3253, "tier": "Medium Risk", "ltv": 4084.35, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 63.7}, {"id": "9133-AYJZG", "tenure": 23, "contract": "Month-to-month", "charges": 98.7, "prob": 0.3483, "tier": "Medium Risk", "ltv": 2213.24, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 54.4}, {"id": "6305-YLBMM", "tenure": 69, "contract": "One year", "charges": 104.05, "prob": 0.3055, "tier": "Medium Risk", "ltv": 7221.93, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 73.7}, {"id": "9137-UIYPG", "tenure": 35, "contract": "Month-to-month", "charges": 106.9, "prob": 0.2657, "tier": "Medium Risk", "ltv": 3732.03, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 64.1}, {"id": "9793-WECQC", "tenure": 23, "contract": "Month-to-month", "charges": 95.3, "prob": 0.2571, "tier": "Medium Risk", "ltv": 2142.34, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 55.5}, {"id": "9909-IDLEK", "tenure": 20, "contract": "Month-to-month", "charges": 96.8, "prob": 0.1876, "tier": "Low Risk", "ltv": 1900.71, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 57.4}, {"id": "5626-MGTUK", "tenure": 20, "contract": "Month-to-month", "charges": 89.1, "prob": 0.2772, "tier": "Medium Risk", "ltv": 1814.33, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 50.8}, {"id": "5213-TWWJU", "tenure": 28, "contract": "Month-to-month", "charges": 91.0, "prob": 0.3105, "tier": "Medium Risk", "ltv": 2566.4, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 54.4}, {"id": "3567-PQTSO", "tenure": 53, "contract": "One year", "charges": 105.25, "prob": 0.3731, "tier": "Medium Risk", "ltv": 5564.34, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 66.8}, {"id": "0396-YCHWO", "tenure": 36, "contract": "Month-to-month", "charges": 95.4, "prob": 0.4108, "tier": "Medium Risk", "ltv": 3431.8, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 56.9}, {"id": "3886-CERTZ", "tenure": 72, "contract": "One year", "charges": 109.25, "prob": 0.4021, "tier": "Medium Risk", "ltv": 7881.67, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 76.1}, {"id": "2604-IJPDU", "tenure": 20, "contract": "Month-to-month", "charges": 96.55, "prob": 0.3264, "tier": "Medium Risk", "ltv": 1933.28, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 53.2}, {"id": "0917-EZOLA", "tenure": 72, "contract": "Two year", "charges": 104.15, "prob": 0.3286, "tier": "Medium Risk", "ltv": 7572.45, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 75.9}, {"id": "2672-TGEFF", "tenure": 37, "contract": "Month-to-month", "charges": 88.8, "prob": 0.2957, "tier": "Medium Risk", "ltv": 3385.76, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 56.3}, {"id": "0376-OIWME", "tenure": 36, "contract": "Month-to-month", "charges": 93.6, "prob": 0.2744, "tier": "Medium Risk", "ltv": 3374.19, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 58.7}, {"id": "7762-URZQH", "tenure": 66, "contract": "Two year", "charges": 106.05, "prob": 0.2795, "tier": "Medium Risk", "ltv": 6978.42, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 73.9}, {"id": "3692-JHONH", "tenure": 52, "contract": "One year", "charges": 106.5, "prob": 0.3156, "tier": "Medium Risk", "ltv": 5527.62, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 68.2}, {"id": "7124-UGSUR", "tenure": 61, "contract": "One year", "charges": 104.4, "prob": 0.2972, "tier": "Medium Risk", "ltv": 6355.1, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 70.8}, {"id": "0112-QAWRZ", "tenure": 16, "contract": "Month-to-month", "charges": 90.8, "prob": 0.3474, "tier": "Medium Risk", "ltv": 1449.3, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 48.7}, {"id": "5899-OUVKV", "tenure": 31, "contract": "Month-to-month", "charges": 94.5, "prob": 0.3489, "tier": "Medium Risk", "ltv": 2943.75, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 55.8}, {"id": "7826-VVKWT", "tenure": 24, "contract": "Two year", "charges": 96.55, "prob": 0.1509, "tier": "Low Risk", "ltv": 2279.55, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 60.3}, {"id": "9786-IJYDL", "tenure": 35, "contract": "Two year", "charges": 113.2, "prob": 0.0946, "tier": "Low Risk", "ltv": 3939.12, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 72.2}, {"id": "6851-WEFYX", "tenure": 35, "contract": "Month-to-month", "charges": 100.8, "prob": 0.4275, "tier": "Medium Risk", "ltv": 3477.63, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 58.5}, {"id": "4238-JSSWH", "tenure": 35, "contract": "Month-to-month", "charges": 102.05, "prob": 0.2979, "tier": "Medium Risk", "ltv": 3524.44, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 61.5}, {"id": "4154-AQUGT", "tenure": 13, "contract": "Month-to-month", "charges": 89.05, "prob": 0.4098, "tier": "Medium Risk", "ltv": 1157.14, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster A", "rfm": 44.9}, {"id": "1452-KIOVK", "tenure": 22, "contract": "Month-to-month", "charges": 89.1, "prob": 0.4229, "tier": "Medium Risk", "ltv": 1967.24, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 48.4}, {"id": "3207-OYBWH", "tenure": 57, "contract": "Month-to-month", "charges": 95.25, "prob": 0.3583, "tier": "Medium Risk", "ltv": 5405.57, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 64.7}, {"id": "1608-GMEWB", "tenure": 45, "contract": "Month-to-month", "charges": 93.9, "prob": 0.3174, "tier": "Medium Risk", "ltv": 4203.82, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 60.5}, {"id": "9360-OMDZZ", "tenure": 24, "contract": "Month-to-month", "charges": 94.1, "prob": 0.4389, "tier": "Medium Risk", "ltv": 2272.32, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 51.2}, {"id": "1258-YMZNM", "tenure": 27, "contract": "One year", "charges": 110.5, "prob": 0.2317, "tier": "Low Risk", "ltv": 2954.25, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 63.3}, {"id": "6345-ULYRW", "tenure": 44, "contract": "One year", "charges": 88.4, "prob": 0.4046, "tier": "Medium Risk", "ltv": 3915.97, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 56.1}, {"id": "2480-EJWYP", "tenure": 58, "contract": "One year", "charges": 97.8, "prob": 0.2523, "tier": "Medium Risk", "ltv": 5616.6, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 68.3}, {"id": "5937-EORGB", "tenure": 15, "contract": "Month-to-month", "charges": 96.5, "prob": 0.3829, "tier": "Medium Risk", "ltv": 1424.75, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 49.9}, {"id": "1902-XBTFB", "tenure": 22, "contract": "Month-to-month", "charges": 89.4, "prob": 0.4186, "tier": "Medium Risk", "ltv": 1994.25, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 48.7}, {"id": "3259-FDWOY", "tenure": 71, "contract": "Two year", "charges": 106.0, "prob": 0.2713, "tier": "Medium Risk", "ltv": 7575.03, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 76.8}, {"id": "3325-FUYCG", "tenure": 28, "contract": "One year", "charges": 106.1, "prob": 0.2739, "tier": "Medium Risk", "ltv": 2939.36, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 61.2}, {"id": "6845-RGTYS", "tenure": 47, "contract": "Month-to-month", "charges": 98.75, "prob": 0.3381, "tier": "Medium Risk", "ltv": 4615.83, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 62.8}, {"id": "1320-REHCS", "tenure": 52, "contract": "Month-to-month", "charges": 110.75, "prob": 0.3527, "tier": "Medium Risk", "ltv": 5768.35, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 68.4}, {"id": "2722-VOJQL", "tenure": 64, "contract": "One year", "charges": 105.65, "prob": 0.399, "tier": "Medium Risk", "ltv": 6878.4, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 70.4}, {"id": "3951-NJCVI", "tenure": 42, "contract": "Month-to-month", "charges": 95.05, "prob": 0.397, "tier": "Medium Risk", "ltv": 3994.69, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 58.8}, {"id": "8761-NSOBC", "tenure": 44, "contract": "Month-to-month", "charges": 100.55, "prob": 0.4414, "tier": "Medium Risk", "ltv": 4426.87, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 60.9}, {"id": "5857-TYBCJ", "tenure": 44, "contract": "Month-to-month", "charges": 89.2, "prob": 0.3385, "tier": "Medium Risk", "ltv": 3955.93, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 57.7}, {"id": "1013-QCWAM", "tenure": 66, "contract": "Month-to-month", "charges": 100.8, "prob": 0.2973, "tier": "Medium Risk", "ltv": 6651.24, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 71.6}, {"id": "0447-RXSGD", "tenure": 24, "contract": "Month-to-month", "charges": 99.65, "prob": 0.3334, "tier": "Medium Risk", "ltv": 2393.9, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 55.7}, {"id": "6862-CQUMB", "tenure": 37, "contract": "Month-to-month", "charges": 96.1, "prob": 0.252, "tier": "Medium Risk", "ltv": 3589.12, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 61.0}, {"id": "2038-LLMLM", "tenure": 48, "contract": "Month-to-month", "charges": 103.85, "prob": 0.3045, "tier": "Medium Risk", "ltv": 4935.98, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 65.8}, {"id": "7954-MLBUN", "tenure": 31, "contract": "Two year", "charges": 99.45, "prob": 0.0587, "tier": "Low Risk", "ltv": 3095.37, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 68.9}, {"id": "1956-YIFGE", "tenure": 22, "contract": "One year", "charges": 100.05, "prob": 0.2339, "tier": "Low Risk", "ltv": 2171.82, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 57.7}, {"id": "1548-FEHVL", "tenure": 61, "contract": "Month-to-month", "charges": 106.2, "prob": 0.2851, "tier": "Medium Risk", "ltv": 6423.2, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 72.0}, {"id": "9408-HRXRK", "tenure": 45, "contract": "Month-to-month", "charges": 105.15, "prob": 0.2629, "tier": "Medium Risk", "ltv": 4702.19, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 66.5}, {"id": "2040-VZIKE", "tenure": 49, "contract": "Month-to-month", "charges": 100.85, "prob": 0.2675, "tier": "Medium Risk", "ltv": 4901.59, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster B", "rfm": 66.3}, {"id": "6967-QIQRV", "tenure": 15, "contract": "One year", "charges": 101.9, "prob": 0.1539, "tier": "Low Risk", "ltv": 1551.31, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 58.6}, {"id": "7813-ZGGAW", "tenure": 31, "contract": "Month-to-month", "charges": 96.6, "prob": 0.2635, "tier": "Medium Risk", "ltv": 2960.55, "persona": "Digital Enthusiasts & Streamers", "cluster": "Cluster D", "rfm": 58.9}, {"id": "9715-WZCLW", "tenure": 71, "contract": "Two year", "charges": 97.2, "prob": 0.064, "tier": "Low Risk", "ltv": 6907.35, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 82.2}, {"id": "5197-PYEPU", "tenure": 42, "contract": "One year", "charges": 94.45, "prob": 0.0823, "tier": "Low Risk", "ltv": 4008.65, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 68.8}, {"id": "8853-TZDGH", "tenure": 72, "contract": "Two year", "charges": 111.6, "prob": 0.0497, "tier": "Low Risk", "ltv": 8040.12, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 89.7}, {"id": "4293-ETKAP", "tenure": 65, "contract": "Two year", "charges": 79.4, "prob": 0.0238, "tier": "Low Risk", "ltv": 5140.69, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 75.5}, {"id": "3717-LNXKW", "tenure": 38, "contract": "Month-to-month", "charges": 91.7, "prob": 0.171, "tier": "Low Risk", "ltv": 3483.44, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 62.3}, {"id": "4737-AQCPU", "tenure": 72, "contract": "Two year", "charges": 72.1, "prob": 0.0061, "tier": "Low Risk", "ltv": 5088.22, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 81.3}, {"id": "3410-MHHUM", "tenure": 44, "contract": "One year", "charges": 94.4, "prob": 0.1187, "tier": "Low Risk", "ltv": 4190.04, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 67.4}, {"id": "8606-CIQUL", "tenure": 72, "contract": "Two year", "charges": 115.75, "prob": 0.0418, "tier": "Low Risk", "ltv": 8337.13, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 91.0}, {"id": "5229-DTFYB", "tenure": 41, "contract": "Two year", "charges": 98.8, "prob": 0.0504, "tier": "Low Risk", "ltv": 4024.62, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 72.5}, {"id": "6352-GIGGQ", "tenure": 67, "contract": "One year", "charges": 88.8, "prob": 0.0415, "tier": "Low Risk", "ltv": 5931.28, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 78.2}, {"id": "2277-BKJKN", "tenure": 71, "contract": "Two year", "charges": 99.2, "prob": 0.072, "tier": "Low Risk", "ltv": 7093.54, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 82.3}, {"id": "6176-YJWAS", "tenure": 72, "contract": "Two year", "charges": 97.95, "prob": 0.0428, "tier": "Low Risk", "ltv": 7044.96, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 85.7}, {"id": "7017-VFHAY", "tenure": 61, "contract": "Two year", "charges": 115.1, "prob": 0.0369, "tier": "Low Risk", "ltv": 7035.58, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 85.6}, {"id": "8915-NNTRC", "tenure": 72, "contract": "Two year", "charges": 107.7, "prob": 0.0441, "tier": "Low Risk", "ltv": 7745.97, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 89.3}, {"id": "1265-BCFEO", "tenure": 71, "contract": "Two year", "charges": 80.45, "prob": 0.0264, "tier": "Low Risk", "ltv": 5706.67, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 79.0}, {"id": "0536-ACXIP", "tenure": 72, "contract": "Two year", "charges": 109.55, "prob": 0.0799, "tier": "Low Risk", "ltv": 7900.89, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 86.8}, {"id": "4366-CTOUZ", "tenure": 50, "contract": "Two year", "charges": 100.2, "prob": 0.0618, "tier": "Low Risk", "ltv": 5021.55, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 75.2}, {"id": "5846-NEQVZ", "tenure": 71, "contract": "Two year", "charges": 70.85, "prob": 0.0069, "tier": "Low Risk", "ltv": 4926.65, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 79.4}, {"id": "8894-JVDCV", "tenure": 62, "contract": "One year", "charges": 115.05, "prob": 0.1096, "tier": "Low Risk", "ltv": 7100.85, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 80.6}, {"id": "7957-RYHQD", "tenure": 40, "contract": "Month-to-month", "charges": 79.2, "prob": 0.149, "tier": "Low Risk", "ltv": 3180.54, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 57.7}, {"id": "2790-XUYMV", "tenure": 71, "contract": "One year", "charges": 85.45, "prob": 0.0418, "tier": "Low Risk", "ltv": 6059.71, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 79.4}, {"id": "6408-WHTEF", "tenure": 72, "contract": "Two year", "charges": 89.4, "prob": 0.0147, "tier": "Low Risk", "ltv": 6422.63, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 86.3}, {"id": "3913-FCUUW", "tenure": 72, "contract": "Two year", "charges": 70.45, "prob": 0.0089, "tier": "Low Risk", "ltv": 5083.65, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 79.7}, {"id": "9896-UYMIE", "tenure": 66, "contract": "One year", "charges": 114.3, "prob": 0.1006, "tier": "Low Risk", "ltv": 7360.1, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 82.5}, {"id": "6465-GSRCL", "tenure": 67, "contract": "One year", "charges": 106.6, "prob": 0.1011, "tier": "Low Risk", "ltv": 7203.42, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 81.5}, {"id": "8631-NBHFZ", "tenure": 66, "contract": "Two year", "charges": 79.4, "prob": 0.0654, "tier": "Low Risk", "ltv": 5153.41, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 71.2}, {"id": "0020-INWCK", "tenure": 71, "contract": "Two year", "charges": 95.75, "prob": 0.0395, "tier": "Low Risk", "ltv": 6798.71, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 84.1}, {"id": "4654-DLAMQ", "tenure": 64, "contract": "One year", "charges": 97.0, "prob": 0.0449, "tier": "Low Risk", "ltv": 6258.72, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 80.5}, {"id": "5268-DSMNQ", "tenure": 62, "contract": "One year", "charges": 97.95, "prob": 0.1294, "tier": "Low Risk", "ltv": 6018.53, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 74.5}, {"id": "2995-UPRYS", "tenure": 40, "contract": "One year", "charges": 99.2, "prob": 0.1411, "tier": "Low Risk", "ltv": 4042.83, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 67.1}, {"id": "8920-NAVAY", "tenure": 62, "contract": "One year", "charges": 110.75, "prob": 0.1475, "tier": "Low Risk", "ltv": 6918.27, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 78.2}, {"id": "5651-CRHKQ", "tenure": 41, "contract": "One year", "charges": 86.2, "prob": 0.0629, "tier": "Low Risk", "ltv": 3463.09, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 66.4}, {"id": "0959-WHOKV", "tenure": 42, "contract": "One year", "charges": 99.0, "prob": 0.2265, "tier": "Low Risk", "ltv": 4197.46, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 64.3}, {"id": "9788-HNGUT", "tenure": 72, "contract": "Two year", "charges": 116.95, "prob": 0.0429, "tier": "Low Risk", "ltv": 8418.56, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 91.0}, {"id": "2636-SJDOU", "tenure": 64, "contract": "One year", "charges": 84.3, "prob": 0.0648, "tier": "Low Risk", "ltv": 5379.18, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 72.7}, {"id": "5304-EFJLP", "tenure": 72, "contract": "Two year", "charges": 111.65, "prob": 0.0607, "tier": "Low Risk", "ltv": 8043.89, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 88.7}, {"id": "5375-XLDOF", "tenure": 69, "contract": "Two year", "charges": 114.35, "prob": 0.0406, "tier": "Low Risk", "ltv": 7861.33, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 88.3}, {"id": "1023-BQXZE", "tenure": 57, "contract": "Two year", "charges": 74.35, "prob": 0.021, "tier": "Low Risk", "ltv": 4298.09, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 70.8}, {"id": "1568-LJSZU", "tenure": 68, "contract": "Two year", "charges": 92.2, "prob": 0.0155, "tier": "Low Risk", "ltv": 6312.83, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 84.5}, {"id": "0442-ZXKVS", "tenure": 54, "contract": "One year", "charges": 115.6, "prob": 0.1564, "tier": "Low Risk", "ltv": 6273.36, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 75.6}, {"id": "4827-LTQRJ", "tenure": 66, "contract": "One year", "charges": 110.6, "prob": 0.1035, "tier": "Low Risk", "ltv": 7258.15, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 81.8}, {"id": "1779-PWPMG", "tenure": 72, "contract": "Two year", "charges": 114.65, "prob": 0.0501, "tier": "Low Risk", "ltv": 8255.12, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 90.0}, {"id": "6261-RCVNS", "tenure": 42, "contract": "One year", "charges": 73.9, "prob": 0.1326, "tier": "Low Risk", "ltv": 3131.97, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 56.6}, {"id": "4178-EGMON", "tenure": 70, "contract": "Two year", "charges": 88.0, "prob": 0.0235, "tier": "Low Risk", "ltv": 6091.76, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 81.9}, {"id": "8849-PRIQJ", "tenure": 67, "contract": "One year", "charges": 109.4, "prob": 0.134, "tier": "Low Risk", "ltv": 7326.42, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 80.4}, {"id": "8008-ESFLK", "tenure": 53, "contract": "One year", "charges": 110.5, "prob": 0.1169, "tier": "Low Risk", "ltv": 5828.42, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 76.5}, {"id": "6950-TWMYB", "tenure": 54, "contract": "Two year", "charges": 79.95, "prob": 0.0257, "tier": "Low Risk", "ltv": 4321.23, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 71.7}, {"id": "8295-KMENE", "tenure": 59, "contract": "Two year", "charges": 76.45, "prob": 0.0227, "tier": "Low Risk", "ltv": 4523.27, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 72.6}, {"id": "1298-PHBTI", "tenure": 71, "contract": "Two year", "charges": 84.8, "prob": 0.0323, "tier": "Low Risk", "ltv": 6050.68, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 80.0}, {"id": "2933-XEUJM", "tenure": 46, "contract": "Two year", "charges": 79.2, "prob": 0.0275, "tier": "Low Risk", "ltv": 3605.38, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 68.0}, {"id": "6685-GBWJZ", "tenure": 63, "contract": "One year", "charges": 70.8, "prob": 0.015, "tier": "Low Risk", "ltv": 4463.63, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 73.0}, {"id": "0365-TRTPY", "tenure": 37, "contract": "Month-to-month", "charges": 91.2, "prob": 0.1421, "tier": "Low Risk", "ltv": 3371.62, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 63.1}, {"id": "0106-UGRDO", "tenure": 69, "contract": "Two year", "charges": 116.0, "prob": 0.0747, "tier": "Low Risk", "ltv": 8070.16, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 85.6}, {"id": "4829-ZLJTK", "tenure": 72, "contract": "Two year", "charges": 112.4, "prob": 0.078, "tier": "Low Risk", "ltv": 8067.98, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 87.5}, {"id": "7472-EQOAV", "tenure": 71, "contract": "One year", "charges": 86.7, "prob": 0.034, "tier": "Low Risk", "ltv": 6120.3, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 80.9}, {"id": "2659-VXMWZ", "tenure": 67, "contract": "One year", "charges": 111.3, "prob": 0.158, "tier": "Low Risk", "ltv": 7469.74, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 79.8}, {"id": "3316-UWXUY", "tenure": 50, "contract": "Month-to-month", "charges": 93.5, "prob": 0.1468, "tier": "Low Risk", "ltv": 4777.87, "persona": "Champions & VIP Loyalists", "cluster": "Cluster B", "rfm": 67.5}, {"id": "8313-AFGBW", "tenure": 47, "contract": "Two year", "charges": 73.6, "prob": 0.0261, "tier": "Low Risk", "ltv": 3454.45, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 66.0}, {"id": "9681-KYGYB", "tenure": 49, "contract": "Month-to-month", "charges": 88.2, "prob": 0.2407, "tier": "Low Risk", "ltv": 4280.69, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 61.5}, {"id": "8034-RYTVV", "tenure": 55, "contract": "One year", "charges": 84.25, "prob": 0.1109, "tier": "Low Risk", "ltv": 4623.36, "persona": "Champions & VIP Loyalists", "cluster": "Cluster D", "rfm": 66.9}];
+    let filteredData = [...customerData];
+    let currentPage = 1;
+    const pageSize = 12;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+
+      const target = document.getElementById('tab-' + tabId);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      // Set active nav button
+      const buttons = document.querySelectorAll('.nav-tab');
+      buttons.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(tabId)) {
+          btn.classList.add('active');
+        }
+      });
+    }
+
+    function filterData() {
+      const search = document.getElementById('searchId').value.trim().toLowerCase();
+      const persona = document.getElementById('filterPersona').value;
+      const cluster = document.getElementById('filterCluster').value;
+      const tier = document.getElementById('filterTier').value;
+
+      filteredData = customerData.filter(item => {
+        const matchId = !search || item.id.toLowerCase().includes(search);
+        const matchPersona = persona === 'ALL' || item.persona === persona;
+        const matchCluster = cluster === 'ALL' || item.cluster.includes(cluster);
+        const matchTier = tier === 'ALL' || item.tier === tier;
+        return matchId && matchPersona && matchCluster && matchTier;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      const total = filteredData.length;
+      const totalPages = Math.ceil(total / pageSize) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const start = (currentPage - 1) * pageSize;
+      const end = Math.min(start + pageSize, total);
+      const pageSlice = filteredData.slice(start, end);
+
+      if (pageSlice.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 2rem; color: #94a3b8;">No matching customer records found.</td></tr>';
+      } else {
+        pageSlice.forEach(row => {
+          const tr = document.createElement('tr');
+          const probPct = (row.prob * 100).toFixed(1);
+          
+          let tierColor = '#10b981';
+          if (row.tier === 'Critical Risk') tierColor = '#ef4444';
+          else if (row.tier === 'High Risk') tierColor = '#f97316';
+          else if (row.tier === 'Medium Risk') tierColor = '#f59e0b';
+
+          let personaColor = '#6366f1';
+          if (row.persona === 'Champions & VIP Loyalists') personaColor = '#10b981';
+          else if (row.persona === 'At-Risk High Rollers') personaColor = '#ef4444';
+          else if (row.persona === 'Vulnerable Newcomers') personaColor = '#f97316';
+          else if (row.persona === 'Digital Enthusiasts & Streamers') personaColor = '#a855f7';
+          else if (row.persona === 'Budget Anchors') personaColor = '#0ea5e9';
+
+          tr.innerHTML = `
+            <td><strong style="font-family: var(--font-mono); color: #f8fafc;">${row.id}</strong></td>
+            <td><span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${personaColor}; margin-right: 6px;"></span>${row.persona}</td>
+            <td><span style="font-size: 0.8rem; color: #94a3b8;">${row.cluster}</span></td>
+            <td>${row.tenure} mo</td>
+            <td>${row.contract}</td>
+            <td><strong style="font-family: var(--font-mono);">$${row.charges.toFixed(2)}</strong></td>
+            <td><strong style="color: ${tierColor}; font-family: var(--font-mono);">${probPct}%</strong></td>
+            <td><span style="color: ${tierColor}; font-weight: 600; font-size: 0.78rem;">${row.tier}</span></td>
+            <td><strong style="color: #a5b4fc; font-family: var(--font-mono);">$${row.ltv.toFixed(0)}</strong></td>
+            <td><span style="font-family: var(--font-mono);">${row.rfm.toFixed(1)}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('resultCount').textContent = `Showing ${total > 0 ? start + 1 : 0}-${end} of ${total} accounts`;
+      document.getElementById('pageIndicator').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('btnPrev').disabled = currentPage === 1;
+      document.getElementById('btnNext').disabled = currentPage >= totalPages;
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderTable();
+    }
+
+    function exportSegmentsCSV() {
+      let csv = 'CustomerID,PersonaSegment,MLCluster,Tenure,Contract,MonthlyCharges,ChurnProbability,RiskTier,PredictedLTV,RFMHealthScore\n';
+      filteredData.forEach(r => {
+        csv += `"${r.id}","${r.persona}","${r.cluster}",${r.tenure},"${r.contract}",${r.charges},${r.prob},"${r.tier}",${r.ltv},${r.rfm}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', 'filtered_customer_segments.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Initialize on load
+    renderTable();
+  </script>
+</body>
+</html>
