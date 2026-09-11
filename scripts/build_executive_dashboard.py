@@ -1,0 +1,1358 @@
+"""
+Builder script to generate Reports/executive_summary_dashboard.html
+Customer Churn Prediction & Lifetime Value (LTV) Engine - Week 4 Day 4 Capstone
+"""
+
+import os
+import json
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPORTS_DIR = os.path.join(BASE_DIR, "Reports")
+
+html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C-Suite Executive Cockpit: Retention & LTV Strategy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #090d16;
+      --bg-secondary: #0f172a;
+      --bg-card: rgba(15, 23, 42, 0.78);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      
+      --critical-red: #ef4444;
+      --high-orange: #f97316;
+      --medium-amber: #f59e0b;
+      --low-emerald: #10b981;
+      --accent-indigo: #6366f1;
+      --accent-cyan: #0ea5e9;
+      --accent-purple: #a855f7;
+      
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 25%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(14, 165, 233, 0.06) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(79, 70, 229, 0.4);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .brand-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: var(--border-highlight);
+      transform: translateY(-1px);
+    }
+
+    .nav-btn.active {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border-color: var(--accent-indigo);
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .print-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 0.45rem 0.95rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+      transition: all 0.2s;
+    }
+
+    .print-btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+    }
+
+    /* Section Headers */
+    .section-header {
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .section-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.25rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-highlight);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent-indigo)), transparent);
+    }
+
+    .kpi-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      margin: 0.4rem 0 0.2rem 0;
+      color: #fff;
+    }
+
+    .kpi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      margin-top: 0.2rem;
+    }
+
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .badge-crimson { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .badge-indigo { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .badge-cyan { background: rgba(14, 165, 233, 0.15); color: #38bdf8; }
+
+    /* Interactive Simulator Panel */
+    .simulator-panel {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.75));
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: 18px;
+      padding: 1.75rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+    }
+
+    .sim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .sim-title-group h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .sim-tag {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .sim-body {
+      display: grid;
+      grid-template-columns: 1.1fr 1.3fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 960px) {
+      .sim-body { grid-template-columns: 1fr; }
+    }
+
+    .control-group {
+      margin-bottom: 1.4rem;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+
+    .control-val-badge {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(14, 165, 233, 0.15);
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    input[type=range] {
+      width: 100%;
+      height: 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #6366f1;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.7);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .sim-select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .sim-select:focus {
+      border-color: var(--accent-indigo);
+    }
+
+    /* Simulation Output Cards */
+    .sim-results {
+      background: rgba(10, 15, 28, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .res-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 0.9rem;
+    }
+
+    .res-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .res-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      margin-top: 0.25rem;
+    }
+
+    .highlight-net {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.08));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .roi-multiplier {
+      font-size: 2rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #34d399;
+    }
+
+    /* Strategic Pillars Section */
+    .pillars-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .pillar-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .pillar-card:hover {
+      border-color: var(--border-highlight);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .pillar-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.6rem;
+    }
+
+    .pillar-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .pillar-target {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .pillar-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .pm-item {
+      text-align: center;
+    }
+
+    .pm-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .pm-val {
+      font-size: 1.05rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      margin-top: 0.15rem;
+    }
+
+    .pillar-playbook {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 3px solid var(--accent-indigo);
+      padding: 0.6rem 0.8rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1rem;
+      flex: 1;
+    }
+
+    .pillar-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 0.75rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .owner-badge {
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    /* Diagnostics Table */
+    .table-container {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+    }
+
+    .table-header-bar {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 0.85rem 1.25rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 0.95rem 1.25rem;
+      font-size: 0.88rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Phased Roadmap */
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .phase-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.4rem;
+      position: relative;
+    }
+
+    .phase-num {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a5b4fc;
+      margin-bottom: 0.3rem;
+    }
+
+    .phase-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.2rem;
+    }
+
+    .phase-timeline {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      margin-bottom: 0.9rem;
+    }
+
+    .phase-deliverables {
+      list-style: none;
+      font-size: 0.84rem;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .phase-deliverables li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .phase-deliverables li::before {
+      content: '✓';
+      color: var(--low-emerald);
+      font-weight: 800;
+    }
+
+    /* Chart Previews */
+    .chart-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .chart-card:hover {
+      border-color: var(--border-highlight);
+    }
+
+    .chart-img-wrap {
+      background: #fff;
+      padding: 0.75rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chart-img-wrap img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+
+    .chart-info {
+      padding: 1rem 1.25rem;
+    }
+
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .chart-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: 1.75rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: auto;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      header, .simulator-panel input, .nav-actions, .print-btn {
+        display: none !important;
+      }
+      .kpi-card, .pillar-card, .table-container, .phase-card {
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        color: #000 !important;
+        box-shadow: none !important;
+      }
+      .kpi-value, .pillar-title, .section-title, .res-num {
+        color: #000 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand-group">
+      <span class="brand-badge">Executive Deck</span>
+      <div>
+        <h1 class="brand-title">Customer Churn & LTV Strategy Engine</h1>
+        <p class="brand-sub">Executive C-Suite Summary & Strategic Business Recommendations (Week 4 Capstone)</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <a href="executive_summary_dashboard.html" class="nav-btn active">🏛️ Executive Summary</a>
+      <a href="churn_trends_dashboard.html" class="nav-btn">📈 Churn Trends</a>
+      <a href="churn_risk_dashboard.html" class="nav-btn">⚡ Risk Cockpit</a>
+      <a href="customer_segmentation_dashboard.html" class="nav-btn">🎯 Customer Segmentation</a>
+      <button class="print-btn" onclick="window.print()">🖨️ Export / Print</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- Top Executive Vital Signs KPI Grid -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">📊 Enterprise Portfolio Health & Revenue-at-Risk Vital Signs</h2>
+        <p class="section-sub">Comprehensive financial diagnostic across 7,043 customer accounts</p>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">
+        Audited Dataset: 7,043 Subscribers | Model: LogReg + RF + XGBoost
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--card-accent: #6366f1;">
+        <div class="kpi-label">
+          <span>Active Customer Base</span>
+          <span>👥</span>
+        </div>
+        <div class="kpi-value">7,043</div>
+        <span class="kpi-badge badge-indigo">100% Portfolio Scored</span>
+      </div>
+
+      <div class="kpi-card" style="--card-accent: #0ea5e9;">
+        <div class="kpi-label">
+          <span>Monthly Recurring Rev (MRR)</span>
+          <span>💵</span>
+        </div>
+        <div class="kpi-value">$456.1k</div>
+        <span class="kpi-badge badge-cyan">$5.47M Annualized Run-Rate</span>
+      </div>
+
+      <div class="kpi-card" style="--card-accent: #ef4444;">
+        <div class="kpi-label">
+          <span>Monthly Revenue at Risk</span>
+          <span>⚠️</span>
+        </div>
+        <div class="kpi-value" style="color: #f87171;">$139.6k</div>
+        <span class="kpi-badge badge-crimson">30.6% of Portfolio MRR</span>
+      </div>
+
+      <div class="kpi-card" style="--card-accent: #10b981;">
+        <div class="kpi-label">
+          <span>Target Preserved ARR</span>
+          <span>🎯</span>
+        </div>
+        <div class="kpi-value" style="color: #34d399;">$418.9k</div>
+        <span class="kpi-badge badge-emerald">At 25% Churn Reduction</span>
+      </div>
+
+      <div class="kpi-card" style="--card-accent: #f59e0b;">
+        <div class="kpi-label">
+          <span>Net Annual Bottom-Line</span>
+          <span>📈</span>
+        </div>
+        <div class="kpi-value" style="color: #fbbf24;">+$324.1k</div>
+        <span class="kpi-badge badge-amber">Net of All Program Costs</span>
+      </div>
+
+      <div class="kpi-card" style="--card-accent: #a855f7;">
+        <div class="kpi-label">
+          <span>Projected Net ROI</span>
+          <span>🚀</span>
+        </div>
+        <div class="kpi-value" style="color: #c084fc;">+341.8%</div>
+        <span class="kpi-badge badge-emerald">3.42x Capital Multiplier</span>
+      </div>
+    </div>
+
+    <!-- Section 2: Interactive Strategic ROI & Value Simulator -->
+    <div class="simulator-panel">
+      <div class="sim-header">
+        <div class="sim-title-group">
+          <h3>🎛️ Real-Time Strategic Retention ROI & Value Simulator</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Dynamically adjust corporate retention targets and incentive budgets to compute net profit yields and capital efficiency.
+          </p>
+        </div>
+        <span class="sim-tag" id="simRatingTag">Exceptional Capital Leverage</span>
+      </div>
+
+      <div class="sim-body">
+        <!-- Controls Column -->
+        <div class="sim-controls">
+          <div class="control-group">
+            <div class="control-label">
+              <span>Target Churn Reduction (%)</span>
+              <span class="control-val-badge" id="churnTargetVal">25.0%</span>
+            </div>
+            <input type="range" id="churnSlider" min="10" max="50" step="1" value="25">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem;">
+              <span>10% (Conservative)</span>
+              <span>25% (Target)</span>
+              <span>50% (Aggressive)</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>Monthly Retention Incentive Budget ($)</span>
+              <span class="control-val-badge" id="budgetVal">$7,900 / mo</span>
+            </div>
+            <input type="range" id="budgetSlider" min="3000" max="20000" step="500" value="7900">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem;">
+              <span>$3,000 / mo</span>
+              <span>$10,000 / mo</span>
+              <span>$20,000 / mo</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>Target Segment Strategic Focus</span>
+            </div>
+            <select class="sim-select" id="segmentFocus">
+              <option value="all">Entire Portfolio (7,043 accounts - $139.6k/mo risk pool)</option>
+              <option value="high_risk" selected>At-Risk High Rollers & Newcomers (65.5% loss pool - $91.5k/mo)</option>
+              <option value="critical">Critical Tier Only (812 accounts - $52.8k/mo risk pool)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Simulation Outputs Column -->
+        <div class="sim-results">
+          <div class="results-grid">
+            <div class="res-box">
+              <div class="res-label">Monthly MRR Saved</div>
+              <div class="res-num" id="resMonthlySaved" style="color: #38bdf8;">$34,905</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;">Recurring monthly cash flow</div>
+            </div>
+
+            <div class="res-box">
+              <div class="res-label">Annual ARR Preserved</div>
+              <div class="res-num" id="resAnnualSaved" style="color: #34d399;">$418,861</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;">Preserved top-line revenue</div>
+            </div>
+
+            <div class="res-box">
+              <div class="res-label">Annual Program Investment</div>
+              <div class="res-num" id="resAnnualCost" style="color: #f87171;">$94,800</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;">Credits, automation & staff</div>
+            </div>
+
+            <div class="res-box">
+              <div class="res-label">Net Annual Bottom-Line</div>
+              <div class="res-num" id="resNetGain" style="color: #fbbf24;">+$324,061</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;">Added EBITDA contribution</div>
+            </div>
+          </div>
+
+          <div class="highlight-net">
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">Capital Efficiency Return (Net ROI)</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Every $1 invested in retention returns <span id="resMultiplierText" style="color: #34d399; font-weight: 800;">$3.42</span> in recovered profit.</div>
+            </div>
+            <div class="roi-multiplier" id="resRoiPct">+341.8%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: The 5 Strategic Retention Pillars -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">🛡️ Five High-Impact Strategic Retention Pillars</h2>
+        <p class="section-sub">Operationalized retention plays prioritized by financial yield, speed to value, and departmental execution</p>
+      </div>
+    </div>
+
+    <div class="pillars-container">
+      <!-- Pillar 1 -->
+      <div class="pillar-card" style="border-top: 3px solid #ef4444;">
+        <span class="pillar-tag" style="color: #f87171;">Pillar 1 • Immediate Crisis Protocol</span>
+        <h3 class="pillar-title">Concierge Retention for At-Risk High Rollers</h3>
+        <p class="pillar-target">🎯 <strong>811 Accounts</strong> ($90.86/mo ARPU | 84.1% empirical churn | $48.1k/mo loss)</p>
+        
+        <div class="pillar-metrics">
+          <div class="pm-item">
+            <div class="pm-label">Preserved ARR</div>
+            <div class="pm-val" style="color: #34d399;">$173.3k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Annual Budget</div>
+            <div class="pm-val" style="color: #f87171;">$29.2k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Net ROI</div>
+            <div class="pm-val" style="color: #fbbf24;">493.6%</div>
+          </div>
+        </div>
+
+        <div class="pillar-playbook">
+          <strong>Operational SLA:</strong> Mandatory 24-Hour phone outreach from Senior Customer Success Manager upon crossing 70% risk threshold. Offer $15/mo contract renewal credit paired with complimentary 1-year Cyber-Defense Pack.
+        </div>
+
+        <div class="pillar-footer">
+          <span>Owner: <span class="owner-badge">Customer Success & VIP Retention</span></span>
+          <span style="color: #34d399; font-weight: 700;">+30% Target Retention</span>
+        </div>
+      </div>
+
+      <!-- Pillar 2 -->
+      <div class="pillar-card" style="border-top: 3px solid #f97316;">
+        <span class="pillar-tag" style="color: #fb923c;">Pillar 2 • Lifecycle Onboarding</span>
+        <h3 class="pillar-title">90-Day Digital Onboarding & Moat Engineering</h3>
+        <p class="pillar-target">🎯 <strong>894 Accounts</strong> ($67.93/mo ARPU | 79.8% empirical churn | $43.4k/mo loss)</p>
+        
+        <div class="pillar-metrics">
+          <div class="pm-item">
+            <div class="pm-label">Preserved ARR</div>
+            <div class="pm-val" style="color: #34d399;">$130.1k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Annual Budget</div>
+            <div class="pm-val" style="color: #f87171;">$21.5k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Net ROI</div>
+            <div class="pm-val" style="color: #fbbf24;">506.3%</div>
+          </div>
+        </div>
+
+        <div class="pillar-playbook">
+          <strong>Operational SLA:</strong> 3-stage automated nurture drip for early tenure subscribers (Days 1–7, 14–30, 45–60). Free 60-day trial of Online Security and $10 statement credit upon completing 90-day milestone and enabling autopay.
+        </div>
+
+        <div class="pillar-footer">
+          <span>Owner: <span class="owner-badge">Growth Marketing & CX</span></span>
+          <span style="color: #34d399; font-weight: 700;">+25% Target Retention</span>
+        </div>
+      </div>
+
+      <!-- Pillar 3 -->
+      <div class="pillar-card" style="border-top: 3px solid #6366f1;">
+        <span class="pillar-tag" style="color: #a5b4fc;">Pillar 3 • Contract Architecture</span>
+        <h3 class="pillar-title">Contract Commitment & Migration Architecture</h3>
+        <p class="pillar-target">🎯 <strong>3,875 Subscribers</strong> (42.7% churn on Month-to-Month vs 11.2% on 1-Year)</p>
+        
+        <div class="pillar-metrics">
+          <div class="pm-item">
+            <div class="pm-label">Preserved ARR</div>
+            <div class="pm-val" style="color: #34d399;">$58.8k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Annual Budget</div>
+            <div class="pm-val" style="color: #f87171;">$18.5k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Net ROI</div>
+            <div class="pm-val" style="color: #fbbf24;">217.8%</div>
+          </div>
+        </div>
+
+        <div class="pillar-playbook">
+          <strong>Operational SLA:</strong> Launch "Loyalty Rate Lock Guarantee" with tiered migration credits: $10/mo discount on 1-year contract lock, or 2 months free premium streaming on 2-year agreements to eliminate monthly cancellation triggers.
+        </div>
+
+        <div class="pillar-footer">
+          <span>Owner: <span class="owner-badge">Commercial & Pricing Strategy</span></span>
+          <span style="color: #34d399; font-weight: 700;">-25% Contract Risk</span>
+        </div>
+      </div>
+
+      <!-- Pillar 4 -->
+      <div class="pillar-card" style="border-top: 3px solid #0ea5e9;">
+        <span class="pillar-tag" style="color: #38bdf8;">Pillar 4 • Payment Modernization</span>
+        <h3 class="pillar-title">Payment Modernization & Autopay Transition</h3>
+        <p class="pillar-target">🎯 <strong>2,365 Subscribers</strong> (45.6% churn on Electronic Check vs 11.8% on Autopay)</p>
+        
+        <div class="pillar-metrics">
+          <div class="pm-item">
+            <div class="pm-label">Preserved ARR</div>
+            <div class="pm-val" style="color: #34d399;">$37.4k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Annual Budget</div>
+            <div class="pm-val" style="color: #f87171;">$14.2k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Net ROI</div>
+            <div class="pm-val" style="color: #fbbf24;">163.8%</div>
+          </div>
+        </div>
+
+        <div class="pillar-playbook">
+          <strong>Operational SLA:</strong> Instant $15 one-time bill credit upon enrolling in automatic Credit Card or Bank ACH payments. Introduces in-app one-click tokenization to eliminate friction-laden manual paper/electronic billing.
+        </div>
+
+        <div class="pillar-footer">
+          <span>Owner: <span class="owner-badge">Billing Operations & Product UX</span></span>
+          <span style="color: #34d399; font-weight: 700;">-28.8% Payment Risk</span>
+        </div>
+      </div>
+
+      <!-- Pillar 5 -->
+      <div class="pillar-card" style="border-top: 3px solid #10b981;">
+        <span class="pillar-tag" style="color: #34d399;">Pillar 5 • Moat Construction</span>
+        <h3 class="pillar-title">Defensive Service Moat & Cyber-Shield Bundles</h3>
+        <p class="pillar-target">🎯 <strong>1,580 Subscribers</strong> (Fiber Optic users lacking defensive support/security add-ons)</p>
+        
+        <div class="pillar-metrics">
+          <div class="pm-item">
+            <div class="pm-label">Preserved ARR</div>
+            <div class="pm-val" style="color: #34d399;">$19.2k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Annual Budget</div>
+            <div class="pm-val" style="color: #f87171;">$11.5k</div>
+          </div>
+          <div class="pm-item">
+            <div class="pm-label">Net ROI</div>
+            <div class="pm-val" style="color: #fbbf24;">67.6%</div>
+          </div>
+        </div>
+
+        <div class="pillar-playbook">
+          <strong>Operational SLA:</strong> Package Online Security + Tech Support + Online Backup into unified $5.00/mo "Cyber-Shield Pack" (discounted from $10 à la carte). Closes the 27.2% churn risk gap between protected and bare lines.
+        </div>
+
+        <div class="pillar-footer">
+          <span>Owner: <span class="owner-badge">Product Management & Support</span></span>
+          <span style="color: #34d399; font-weight: 700;">-27.2% Moat Risk</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Root Cause Diagnostics & Hazard Drivers -->
+    <div class="table-container">
+      <div class="table-header-bar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">⚡ Attrition Root-Cause Analysis: Structural Hazards vs. Defensive Moats</h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem;">Empirical churn risk differentials quantified across customer behavior and account architecture</p>
+        </div>
+        <span class="brand-badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+          Statistical Odds Ratios
+        </span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Structural Factor / Feature</th>
+            <th>Churn Rate With Factor</th>
+            <th>Churn Rate Without</th>
+            <th>Net Risk Differential</th>
+            <th>Operational Mitigation Play</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Month-to-Month Contract</strong></td>
+            <td><span style="color: #f87171; font-weight: 700;">42.74%</span></td>
+            <td>6.65%</td>
+            <td><span style="color: #f87171; font-weight: 800;">+36.09%</span></td>
+            <td>Pillar 3: Tiered $10/mo discount on 1-year annual lock-in</td>
+          </tr>
+          <tr>
+            <td><strong>Absence of Online Security</strong></td>
+            <td><span style="color: #f87171; font-weight: 700;">41.98%</span></td>
+            <td>11.24%</td>
+            <td><span style="color: #f87171; font-weight: 800;">+30.74%</span></td>
+            <td>Pillars 2 & 5: Free 60-day security trial & $5 Cyber-Shield pack</td>
+          </tr>
+          <tr>
+            <td><strong>Tenure &lt; 6 Months (Onboarding Cliff)</strong></td>
+            <td><span style="color: #f87171; font-weight: 700;">50.22%</span></td>
+            <td>20.19%</td>
+            <td><span style="color: #f87171; font-weight: 800;">+30.03%</span></td>
+            <td>Pillar 2: 90-day automated customer onboarding nurture drip</td>
+          </tr>
+          <tr>
+            <td><strong>Absence of Tech Support</strong></td>
+            <td><span style="color: #f87171; font-weight: 700;">41.72%</span></td>
+            <td>11.70%</td>
+            <td><span style="color: #f87171; font-weight: 800;">+30.02%</span></td>
+            <td>Pillars 1 & 5: VIP complimentary support routing</td>
+          </tr>
+          <tr>
+            <td><strong>Electronic Check Payment Method</strong></td>
+            <td><span style="color: #f87171; font-weight: 700;">45.62%</span></td>
+            <td>16.84%</td>
+            <td><span style="color: #f87171; font-weight: 800;">+28.78%</span></td>
+            <td>Pillar 4: One-time $15 bill credit for autopay enrollment</td>
+          </tr>
+          <tr>
+            <td><strong>Fiber Optic Internet (Unbundled)</strong></td>
+            <td><span style="color: #f87171; font-weight: 700;">42.22%</span></td>
+            <td>14.18%</td>
+            <td><span style="color: #f87171; font-weight: 800;">+28.05%</span></td>
+            <td>Pillar 5: Mandatory security/backup bundling on fiber tiers</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 5: 90-Day Implementation Timeline & RACI Matrix -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">📅 Phased 90-Day Execution Roadmap & Departmental RACI</h2>
+        <p class="section-sub">Staged roll-out schedule ensuring immediate cash preservation and scalable engineering handoff</p>
+      </div>
+    </div>
+
+    <div class="roadmap-grid">
+      <div class="phase-card" style="border-top: 3px solid #ef4444;">
+        <div class="phase-num">Phase 1 • Days 1 – 30</div>
+        <h3 class="phase-title">Immediate Crisis Intervention</h3>
+        <div class="phase-timeline">Target Savings: $14,443 / mo ($173.3k / yr)</div>
+        <ul class="phase-deliverables">
+          <li>Deploy daily Critical/High risk account alert feed to Customer Success.</li>
+          <li>Enforce mandatory 24-hour phone outreach SLA for 811 High Rollers.</li>
+          <li>Empower CSMs with $15/mo retention credit + free security bundle.</li>
+          <li>Executive weekly review of High Roller save rates and escalation log.</li>
+        </ul>
+        <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--text-muted);">
+          Lead: <strong style="color: #fff;">VP Customer Success</strong>
+        </div>
+      </div>
+
+      <div class="phase-card" style="border-top: 3px solid #f59e0b;">
+        <div class="phase-num">Phase 2 • Days 31 – 60</div>
+        <h3 class="phase-title">Digital Moats & Friction Removal</h3>
+        <div class="phase-timeline">Cumulative Savings: $28,404 / mo ($340.8k / yr)</div>
+        <ul class="phase-deliverables">
+          <li>Launch 90-day automated customer onboarding sequence (Days 1, 14, 45).</li>
+          <li>Roll out $15 Autopay migration portal across digital billing portal.</li>
+          <li>Introduce $5/mo bundled Cyber-Shield pack in billing portal.</li>
+          <li>Deploy self-service contract renewal discount widget in user portal.</li>
+        </ul>
+        <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--text-muted);">
+          Lead: <strong style="color: #fff;">CMO & VP Billing Operations</strong>
+        </div>
+      </div>
+
+      <div class="phase-card" style="border-top: 3px solid #10b981;">
+        <div class="phase-num">Phase 3 • Days 61 – 90</div>
+        <h3 class="phase-title">Enterprise MLOps & Production Scale</h3>
+        <div class="phase-timeline">Cumulative Savings: $34,905 / mo ($418.9k / yr)</div>
+        <ul class="phase-deliverables">
+          <li>Integrate FastAPI <code>/predict</code> and <code>/batch_predict</code> into production CRM.</li>
+          <li>Implement automated monthly model retraining & feature drift alerts.</li>
+          <li>Deploy live C-Suite BI telemetry dashboard for continuous monitoring.</li>
+          <li>Full executive handoff and enterprise retention SLA audit.</li>
+        </ul>
+        <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--text-muted);">
+          Lead: <strong style="color: #fff;">Head of Data Science & Eng.</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Publication Visual Gallery -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">🖼️ Executive Visual Analytics Gallery</h2>
+        <p class="section-sub">Publication-grade 300 DPI visualization artifacts prepared for board presentation</p>
+      </div>
+    </div>
+
+    <div class="chart-gallery">
+      <div class="chart-card">
+        <div class="chart-img-wrap">
+          <img src="executive_financial_impact_roi.png" alt="Executive Financial Impact & ROI Scenarios">
+        </div>
+        <div class="chart-info">
+          <h4 class="chart-title">Multi-Scenario Financial ROI & Bottom-Line Gain</h4>
+          <p class="chart-sub">Preserved ARR vs Program Cost, Net Gain ($k/yr), and Capital Multipliers.</p>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-img-wrap">
+          <img src="executive_strategic_roadmap.png" alt="Strategic Pillars & 90-Day Execution Timeline">
+        </div>
+        <div class="chart-info">
+          <h4 class="chart-title">Strategic Pillar Revenue Allocation & Ramp-Up</h4>
+          <p class="chart-sub">Annual revenue preserved per pillar and 90-day cumulative value ramp.</p>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-img-wrap">
+          <img src="executive_portfolio_scorecard.png" alt="Executive Portfolio Health Scorecard">
+        </div>
+        <div class="chart-info">
+          <h4 class="chart-title">Portfolio Health & Vulnerability Scorecard</h4>
+          <p class="chart-sub">Risk tier pie chart, monthly loss by tier, hazard catalysts, and persona exposure.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p><strong>Customer Churn Prediction & Lifetime Value (LTV) Engine</strong> • Executive Strategy & Business Intelligence Suite</p>
+    <p style="margin-top: 0.35rem; font-size: 0.78rem;">Project Team: Afreen Begam (Data/Eng/Modeling) • Srikanth Kondadasula (EDA/Insights) • Renuka (Cleaning/ML/FastAPI)</p>
+  </footer>
+
+  <!-- Real-Time Interactive Simulator Script -->
+  <script>
+    const churnSlider = document.getElementById('churnSlider');
+    const budgetSlider = document.getElementById('budgetSlider');
+    const segmentFocus = document.getElementById('segmentFocus');
+    
+    const churnTargetVal = document.getElementById('churnTargetVal');
+    const budgetVal = document.getElementById('budgetVal');
+    
+    const resMonthlySaved = document.getElementById('resMonthlySaved');
+    const resAnnualSaved = document.getElementById('resAnnualSaved');
+    const resAnnualCost = document.getElementById('resAnnualCost');
+    const resNetGain = document.getElementById('resNetGain');
+    const resRoiPct = document.getElementById('resRoiPct');
+    const resMultiplierText = document.getElementById('resMultiplierText');
+    const simRatingTag = document.getElementById('simRatingTag');
+
+    const BASE_TOTAL_RISK_MO = 139620.25;
+    const HIGH_ROLLER_NEWCOMER_RISK_MO = 91507.88;
+    const CRITICAL_TIER_RISK_MO = 52753.96;
+
+    function formatCurrency(val) {
+      return '$' + Math.round(val).toLocaleString();
+    }
+
+    function updateSimulation() {
+      const churnPct = parseFloat(churnSlider.value);
+      const monthlyBudget = parseFloat(budgetSlider.value);
+      const focus = segmentFocus.value;
+
+      churnTargetVal.textContent = churnPct.toFixed(1) + '%';
+      budgetVal.textContent = '$' + monthlyBudget.toLocaleString() + ' / mo';
+
+      let riskPool = BASE_TOTAL_RISK_MO;
+      if (focus === 'high_risk') {
+        riskPool = HIGH_ROLLER_NEWCOMER_RISK_MO;
+      } else if (focus === 'critical') {
+        riskPool = CRITICAL_TIER_RISK_MO;
+      }
+
+      const monthlySaved = riskPool * (churnPct / 100.0);
+      const annualSaved = monthlySaved * 12;
+      const annualCost = monthlyBudget * 12;
+      const netGain = annualSaved - annualCost;
+      const roiPct = annualCost > 0 ? (netGain / annualCost) * 100 : 0;
+      const multiplier = annualCost > 0 ? (annualSaved / annualCost) : 1;
+
+      resMonthlySaved.textContent = formatCurrency(monthlySaved);
+      resAnnualSaved.textContent = formatCurrency(annualSaved);
+      resAnnualCost.textContent = formatCurrency(annualCost);
+      resNetGain.textContent = (netGain >= 0 ? '+' : '') + formatCurrency(netGain);
+      
+      if (netGain >= 0) {
+        resNetGain.style.color = '#fbbf24';
+        resRoiPct.style.color = '#34d399';
+      } else {
+        resNetGain.style.color = '#f87171';
+        resRoiPct.style.color = '#f87171';
+      }
+
+      resRoiPct.textContent = (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%';
+      resMultiplierText.textContent = '$' + multiplier.toFixed(2);
+
+      if (roiPct > 300) {
+        simRatingTag.textContent = 'Exceptional Capital Leverage';
+        simRatingTag.style.borderColor = '#10b981';
+        simRatingTag.style.color = '#34d399';
+      } else if (roiPct > 150) {
+        simRatingTag.textContent = 'Strong Enterprise Efficiency';
+        simRatingTag.style.borderColor = '#6366f1';
+        simRatingTag.style.color = '#a5b4fc';
+      } else if (roiPct > 50) {
+        simRatingTag.textContent = 'Viable Positive Return';
+        simRatingTag.style.borderColor = '#f59e0b';
+        simRatingTag.style.color = '#fbbf24';
+      } else {
+        simRatingTag.textContent = 'Marginal / High Spend';
+        simRatingTag.style.borderColor = '#ef4444';
+        simRatingTag.style.color = '#f87171';
+      }
+    }
+
+    churnSlider.addEventListener('input', updateSimulation);
+    budgetSlider.addEventListener('input', updateSimulation);
+    segmentFocus.addEventListener('change', updateSimulation);
+
+    // Initial Calculation
+    updateSimulation();
+  </script>
+
+</body>
+</html>
+"""
+
+output_path = os.path.join(REPORTS_DIR, "executive_summary_dashboard.html")
+with open(output_path, "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print(f"Generated Executive Summary Dashboard: {output_path}")
+print(f"File size: {os.path.getsize(output_path):,} bytes")
