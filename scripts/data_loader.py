@@ -23,3 +23,6 @@ df.to_sql(
 )
 
 print(f"Data loaded successfully! {len(df)} rows inserted.")
+
+
+print(f"Data loaded successfully! {len(df)} rows inserted.")
