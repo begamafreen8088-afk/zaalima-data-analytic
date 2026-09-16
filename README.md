@@ -468,7 +468,15 @@ Responsibilities:
 
 ## Project Status
 
-=======
+
+ Week 1 Completed
+
+ Week 2 Completed
+
+ Week 3 Completed
+
+ Week 4 Completed
+
 Churn and LTV for multiple customers simultaneously
 Key Features
 Customer Churn Prediction
@@ -534,6 +542,7 @@ Week 3 Completed
  Week 4 Completed
 
 ⸻ 
+
 
 
 Project: Customer Churn Prediction & Lifetime Value (LTV) Engine
