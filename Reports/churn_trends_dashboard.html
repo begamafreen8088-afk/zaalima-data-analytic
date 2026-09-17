@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Churn Trend Reports & Executive Retention Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --churn-red: #f43f5e;
+      --churn-red-glow: rgba(244, 63, 94, 0.18);
+      --retain-blue: #0ea5e9;
+      --accent-indigo: #6366f1;
+      --success-emerald: #10b981;
+      --warning-amber: #f59e0b;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Background Glow */
+    .glow-sphere {
+      position: fixed;
+      top: -100px;
+      right: 15%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(244, 63, 94, 0.04) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1.8rem;
+    }
+
+    .header-title h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      padding: 0.3rem 0.7rem;
+      border-radius: 9999px;
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--churn-red);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      vertical-align: middle;
+      -webkit-text-fill-color: initial;
+    }
+
+    .header-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-top: 0.4rem;
+    }
+
+    .header-meta {
+      text-align: right;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .header-meta strong {
+      color: #e2e8f0;
+    }
+
+    /* KPI Summary Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.35rem 1.25rem;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-highlight);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--accent-color, var(--accent-indigo));
+    }
+
+    .kpi-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .kpi-value {
+      font-size: 1.95rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-family: var(--font-mono);
+      margin-bottom: 0.35rem;
+    }
+
+    .kpi-trend {
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .kpi-trend.negative { color: var(--churn-red); }
+    .kpi-trend.positive { color: var(--success-emerald); }
+    .kpi-trend.neutral { color: var(--warning-amber); }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 0.6rem;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .nav-tab {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.65rem 1.25rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .nav-tab.active {
+      background: var(--accent-indigo);
+      color: #ffffff;
+      border-color: var(--accent-indigo);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    /* Tab Content Panels */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out forwards;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Report Section Containers */
+    .report-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(16px);
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Dual Column Layout */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    .chart-box img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.75rem;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Insight Cards & Bullet Callouts */
+    .insights-box {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .insight-card {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-color);
+      border-radius: 0.85rem;
+      padding: 1.2rem;
+      border-left: 4px solid var(--accent-color, var(--accent-indigo));
+    }
+
+    .insight-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #f1f5f9;
+    }
+
+    .insight-card p {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* Modern Styled Data Tables */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 0.85rem;
+      border: 1px solid var(--border-color);
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(30, 41, 59, 0.85);
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.85rem 1rem;
+      font-size: 0.78rem;
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .tag-danger { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+    .tag-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .tag-success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .tag-info { background: rgba(14, 165, 233, 0.15); color: #38bdf8; }
+
+    /* Interactive Calculator */
+    .calculator-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(14, 165, 233, 0.04) 100%);
+      border: 1px solid var(--border-highlight);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+
+    .calc-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 1.2rem;
+    }
+
+    .slider-group {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent-indigo);
+      height: 6px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .calc-results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      flex: 2;
+    }
+
+    .calc-res-card {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-color);
+      border-radius: 0.85rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .calc-res-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--success-emerald);
+      font-family: var(--font-mono);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-sphere"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-title">
+        <h1>Churn Trend Reports & Insights Engine <span class="badge">Week 4 Active</span></h1>
+        <p class="header-subtitle">Comprehensive Diagnostic & Financial Exposure Intelligence on Telco Customer Base</p>
+      </div>
+      <div class="header-meta">
+        <div>Total Scope: <strong>7,043 Accounts</strong></div>
+        <div>Dataset: <strong>WA_Fn-UseC_-Telco-Customer-Churn</strong></div>
+        <div>Output Mode: <strong>Production Executive Suite</strong></div>
+      </div>
+    </header>
+
+    <!-- Top KPI Highlights -->
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--accent-color: var(--churn-red);">
+        <div class="kpi-label">Overall Churn Rate</div>
+        <div class="kpi-value" style="color: var(--churn-red);">26.54%</div>
+        <div class="kpi-trend negative">
+          <span>●</span> 1,869 accounts lost from 7,043
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--warning-amber);">
+        <div class="kpi-label">Monthly Revenue At Risk</div>
+        <div class="kpi-value" style="color: var(--warning-amber);">$139.1k</div>
+        <div class="kpi-trend negative">
+          <span>●</span> 30.50% of total portfolio MRR
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--churn-red);">
+        <div class="kpi-label">Annualized Churn Loss</div>
+        <div class="kpi-value" style="color: #f87171;">$1.67M</div>
+        <div class="kpi-trend negative">
+          <span>●</span> Total run-rate cash drain/yr
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--churn-red);">
+        <div class="kpi-label">Early-Stage Cliff (0-6 Mo)</div>
+        <div class="kpi-value" style="color: #fb7185;">52.94%</div>
+        <div class="kpi-trend negative">
+          <span>●</span> 784 churners in first 180 days
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--accent-indigo);">
+        <div class="kpi-label">Contract Risk Gap</div>
+        <div class="kpi-value" style="color: #a5b4fc;">15.1x</div>
+        <div class="kpi-trend neutral">
+          <span>●</span> M2M (42.7%) vs 2-Yr (2.8%)
+        </div>
+      </div>
+
+      <div class="kpi-card" style="--accent-color: var(--success-emerald);">
+        <div class="kpi-label">Tech Support Buffer</div>
+        <div class="kpi-value" style="color: var(--success-emerald);">-26.5%</div>
+        <div class="kpi-trend positive">
+          <span>●</span> Churn cuts from 41.6% to 15.2%
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('overview')">Executive Summary</button>
+      <button class="nav-tab" onclick="switchTab('tenure')">Tenure & Lifecycle</button>
+      <button class="nav-tab" onclick="switchTab('contracts')">Contracts & Commitments</button>
+      <button class="nav-tab" onclick="switchTab('revenue')">Spend & Revenue-at-Risk</button>
+      <button class="nav-tab" onclick="switchTab('services')">Services & Ecosystem</button>
+      <button class="nav-tab" onclick="switchTab('billing')">Billing & Payment Channels</button>
+      <button class="nav-tab" onclick="switchTab('matrix')">Risk Segmentation Matrix</button>
+      <button class="nav-tab" onclick="switchTab('playbook')">Strategic Retention Playbook</button>
+    </div>
+
+    <!-- TAB 1: Executive Overview -->
+    <div id="tab-overview" class="tab-panel active">
+      <div class="report-section">
+        <h2 class="section-title">Strategic Executive Briefing</h2>
+        <p class="section-desc">Macro-level synthesis of customer attrition drivers, cash flow impact, and critical retention bottlenecks.</p>
+
+        <div class="grid-2col">
+          <div class="chart-box">
+            <img src="churn_risk_segmentation_matrix.png" alt="Churn Risk Matrix">
+          </div>
+          <div class="insights-box">
+            <div class="insight-card" style="--accent-color: var(--churn-red);">
+              <h4>The 180-Day Danger Zone</h4>
+              <p>Over 41.9% of all lifetime churn occurs within the first 6 months. Customers enter without structured onboarding, face initial configuration friction, and exit before habituation can form.</p>
+            </div>
+            <div class="insight-card" style="--accent-color: var(--warning-amber);">
+              <h4>Month-to-Month Exposure</h4>
+              <p>3,875 accounts (55.0% of the customer base) operate on month-to-month contracts. This single group produces <strong>88.5% ($110,642/mo)</strong> of all lost monthly recurring revenue.</p>
+            </div>
+            <div class="insight-card" style="--accent-color: var(--retain-blue);">
+              <h4>High-ARPU Fiber Optic Vulnerability</h4>
+              <p>Fiber Optic produces our highest monthly charges ($91.50/mo), yet suffers a <strong>41.89% churn rate</strong>. Premium pricing without bundled proactive tech support produces extreme consumer sensitivity to outages.</p>
+            </div>
+            <div class="insight-card" style="--accent-color: var(--success-emerald);">
+              <h4>Support Bundles Create Defensible Moats</h4>
+              <p>Customers subscribed to Online Security and Tech Support exhibit an astonishing <strong>63%+ relative drop in churn</strong> (down to ~14.6%–15.2%). Support services provide immediate issue remediation before frustration triggers cancellation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Tenure & Lifecycle -->
+    <div id="tab-tenure" class="tab-panel">
+      <div class="report-section">
+        <h2 class="section-title">Customer Tenure & Survival Lifecycle Trends</h2>
+        <p class="section-desc">Longitudinal attrition patterns illustrating the rapid drop-off in early months followed by long-term customer lock-in.</p>
+
+        <div class="grid-2col">
+          <div class="chart-box">
+            <img src="churn_tenure_cohort_trend.png" alt="Tenure Cohort Trend">
+          </div>
+          <div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tenure Cohort</th>
+                    <th>Accounts</th>
+                    <th>Churned</th>
+                    <th>Churn Rate</th>
+                    <th>Avg MRR</th>
+                    <th>Risk Tag</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>0–6 Months</strong></td>
+                    <td>1,481</td>
+                    <td>784</td>
+                    <td><strong style="color: var(--churn-red);">52.94%</strong></td>
+                    <td>$54.74</td>
+                    <td><span class="tag tag-danger">Critical Risk</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>7–12 Months</strong></td>
+                    <td>705</td>
+                    <td>253</td>
+                    <td><strong style="color: var(--warning-amber);">35.89%</strong></td>
+                    <td>$58.95</td>
+                    <td><span class="tag tag-warning">Elevated Risk</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>13–24 Months</strong></td>
+                    <td>1,024</td>
+                    <td>294</td>
+                    <td>28.71%</td>
+                    <td>$61.36</td>
+                    <td><span class="tag tag-info">Stabilizing</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>25–48 Months</strong></td>
+                    <td>1,594</td>
+                    <td>325</td>
+                    <td>20.39%</td>
+                    <td>$65.93</td>
+                    <td><span class="tag tag-success">Loyal</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>49–72 Months</strong></td>
+                    <td>2,239</td>
+                    <td>213</td>
+                    <td><strong style="color: var(--success-emerald);">9.51%</strong></td>
+                    <td>$73.95</td>
+                    <td><span class="tag tag-success">Core Anchor</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-top: 1.5rem;" class="insight-card" style="--accent-color: var(--accent-indigo);">
+              <h4>Tenure Lifecycle Dynamics</h4>
+              <p>Notice how customer value naturally expands over time: retained accounts at 49–72 months pay an average of <strong>$73.95/mo</strong>, compared to $54.74/mo in the initial cohort. Long-term customer retention directly powers portfolio ARPU expansion.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Contracts & Commitments -->
+    <div id="tab-contracts" class="tab-panel">
+      <div class="report-section">
+        <h2 class="section-title">Contract Structure & Long-Term Commitment Trajectory</h2>
+        <p class="section-desc">Comparing Month-to-Month flexibility with One-Year and Two-Year contractual commitment levels.</p>
+
+        <div class="grid-2col">
+          <div class="chart-box">
+            <img src="churn_contract_risk_trend.png" alt="Contract Risk Trend">
+          </div>
+          <div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Contract Type</th>
+                    <th>Accounts</th>
+                    <th>Churn Rate</th>
+                    <th>Total MRR</th>
+                    <th>Lost MRR / Mo</th>
+                    <th>Multiplier</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Month-to-month</strong></td>
+                    <td>3,875</td>
+                    <td><strong style="color: var(--churn-red);">42.71%</strong></td>
+                    <td>$257,294.15</td>
+                    <td>$110,642.50</td>
+                    <td><span class="tag tag-danger">15.1x Baseline</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>One year</strong></td>
+                    <td>1,473</td>
+                    <td>11.27%</td>
+                    <td>$95,816.60</td>
+                    <td>$10,812.35</td>
+                    <td><span class="tag tag-warning">4.0x Baseline</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Two year</strong></td>
+                    <td>1,695</td>
+                    <td><strong style="color: var(--success-emerald);">2.83%</strong></td>
+                    <td>$103,005.85</td>
+                    <td>$2,914.80</td>
+                    <td><span class="tag tag-success">1.0x (Reference)</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-top: 1.5rem;" class="insight-card" style="--accent-color: var(--warning-amber);">
+              <h4>Strategic Implication: Contract Inoculation</h4>
+              <p>Even among older customers, Month-to-Month contracts remain fundamentally fragile. Structuring a low-friction incentive (e.g., $5/mo bill credit or free router upgrade) to transition M2M users into 1-year agreements is our most cost-effective lever to eradicate 70%+ of projected cancellations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Revenue & Spend Tiers -->
+    <div id="tab-revenue" class="tab-panel">
+      <div class="report-section">
+        <h2 class="section-title">Spend Tier Fragility & Monthly Recurring Revenue (MRR) at Risk</h2>
+        <p class="section-desc">Evaluating churn concentration across price points and customer billing brackets.</p>
+
+        <div class="grid-2col">
+          <div class="chart-box">
+            <img src="churn_revenue_monthly_charges_trend.png" alt="Revenue Trend">
+          </div>
+          <div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Monthly Charges Tier</th>
+                    <th>Accounts</th>
+                    <th>Churn %</th>
+                    <th>Lost MRR ($)</th>
+                    <th>Share of Lost Cash</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Low (&lt;$35)</strong></td>
+                    <td>1,735</td>
+                    <td>10.89%</td>
+                    <td>$4,458.05</td>
+                    <td>3.2%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Moderate ($35–$60)</strong></td>
+                    <td>1,183</td>
+                    <td>25.44%</td>
+                    <td>$14,626.50</td>
+                    <td>10.5%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mid-High ($60–$80)</strong></td>
+                    <td>1,459</td>
+                    <td>32.42%</td>
+                    <td>$34,696.95</td>
+                    <td>24.9%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>High ($80–$100)</strong></td>
+                    <td>1,764</td>
+                    <td><strong style="color: var(--churn-red);">37.02%</strong></td>
+                    <td><strong>$58,785.25</strong></td>
+                    <td><span class="tag tag-danger">42.3% of Total</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ultra High (&gt;$100)</strong></td>
+                    <td>902</td>
+                    <td>28.05%</td>
+                    <td>$26,564.10</td>
+                    <td>19.1%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-top: 1.5rem;" class="insight-card" style="--accent-color: var(--churn-red);">
+              <h4>86.3% of Lost Cash Resides in >$60 Accounts</h4>
+              <p>Retention budgets must not be allocated uniformly. Customers spending over $60/month drive $120,046 of our $139,130 monthly loss. Tiered retention perks should be targeted exclusively at accounts with Monthly Charges ≥ $70.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: Services & Ecosystem -->
+    <div id="tab-services" class="tab-panel">
+      <div class="report-section">
+        <h2 class="section-title">Product Ecosystem & Service "Stickiness" Buffer</h2>
+        <p class="section-desc">How technical architecture and auxiliary add-ons directly determine customer retention durability.</p>
+
+        <div class="grid-2col">
+          <div class="chart-box">
+            <img src="churn_service_stickiness_trend.png" alt="Service Stickiness Trend">
+          </div>
+          <div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Add-On Feature</th>
+                    <th>Without Service</th>
+                    <th>With Service</th>
+                    <th>Absolute Cut</th>
+                    <th>Relative Protection</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Online Security</strong></td>
+                    <td>41.77%</td>
+                    <td><strong style="color: var(--success-emerald);">14.61%</strong></td>
+                    <td>-27.16%</td>
+                    <td><span class="tag tag-success">65.0% safer</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tech Support</strong></td>
+                    <td>41.64%</td>
+                    <td><strong style="color: var(--success-emerald);">15.17%</strong></td>
+                    <td>-26.47%</td>
+                    <td><span class="tag tag-success">63.6% safer</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Online Backup</strong></td>
+                    <td>39.93%</td>
+                    <td>21.53%</td>
+                    <td>-18.40%</td>
+                    <td><span class="tag tag-info">46.1% safer</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Device Protection</strong></td>
+                    <td>39.13%</td>
+                    <td>22.50%</td>
+                    <td>-16.63%</td>
+                    <td><span class="tag tag-info">42.5% safer</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-top: 1.5rem;" class="insight-card" style="--accent-color: var(--retain-blue);">
+              <h4>The "Security & Support" Bundle Imperative</h4>
+              <p>Customers lacking security and tech support have an unbuffered, direct path to cancellation whenever any service disruption arises. Packaging free 6-month trials of Tech Support with new broadband signups will proactively collapse churn rates.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: Billing & Payment Channels -->
+    <div id="tab-billing" class="tab-panel">
+      <div class="report-section">
+        <h2 class="section-title">Billing Mechanics & Payment Friction Dynamics</h2>
+        <p class="section-desc">Payment channel vulnerability: Manual vs Automated transactions and Paperless invoice effects.</p>
+
+        <div class="grid-2col">
+          <div class="chart-box">
+            <img src="churn_payment_billing_trend.png" alt="Payment Trend">
+          </div>
+          <div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Payment Channel</th>
+                    <th>Total Accounts</th>
+                    <th>Churn Rate</th>
+                    <th>M2M Churn Rate</th>
+                    <th>Risk Profile</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Electronic Check</strong></td>
+                    <td>2,365</td>
+                    <td><strong style="color: var(--churn-red);">45.29%</strong></td>
+                    <td><strong style="color: var(--churn-red);">53.73%</strong></td>
+                    <td><span class="tag tag-danger">Critical Hazard</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mailed Check</strong></td>
+                    <td>1,612</td>
+                    <td>19.11%</td>
+                    <td>31.58%</td>
+                    <td><span class="tag tag-warning">Moderate</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bank Transfer (Auto)</strong></td>
+                    <td>1,544</td>
+                    <td>16.71%</td>
+                    <td>34.13%</td>
+                    <td><span class="tag tag-success">Automated Anchor</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Credit Card (Auto)</strong></td>
+                    <td>1,522</td>
+                    <td><strong style="color: var(--success-emerald);">15.24%</strong></td>
+                    <td>32.78%</td>
+                    <td><span class="tag tag-success">Lowest Churn</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-top: 1.5rem;" class="insight-card" style="--accent-color: var(--churn-red);">
+              <h4>Electronic Check is an Active Risk Signal</h4>
+              <p>Electronic check requires active monthly involvement and manual re-authorizations, creating 12 micro-decision cancellation opportunities per year. Automated billing converts payments into a passive background process, cutting churn by almost two-thirds.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 7: Risk Segmentation Matrix -->
+    <div id="tab-matrix" class="tab-panel">
+      <div class="report-section">
+        <h2 class="section-title">Customer Retention Risk Segmentation Matrix</h2>
+        <p class="section-desc">2x2 strategic framework plotting customer accounts along Loyalty (Tenure) and Account Value (Monthly Charges).</p>
+
+        <div class="grid-2col">
+          <div class="chart-box">
+            <img src="churn_risk_segmentation_matrix.png" alt="Matrix Plot">
+          </div>
+          <div class="insights-box">
+            <div class="insight-card" style="--accent-color: var(--churn-red);">
+              <h4>Quadrant I: Immediate Intervention (High Spend, High Risk)</h4>
+              <p><strong>2,130 accounts (44.8% churn rate)</strong>. Produces ~$79,840/month in lost revenue. These are high-paying customers on month-to-month contracts and fiber optic lines. Immediate proactive outreach required.</p>
+            </div>
+            <div class="insight-card" style="--accent-color: var(--success-emerald);">
+              <h4>Quadrant II: Core VIPs (High Spend, Low Risk)</h4>
+              <p><strong>1,386 accounts (13.9% churn rate)</strong>. High lifetime value, long-term contract holders. Protect with dedicated VIP concierge support and proactive renewal terms 60 days before contract expiry.</p>
+            </div>
+            <div class="insight-card" style="--accent-color: var(--warning-amber);">
+              <h4>Quadrant III: High Churn / Low ARPU (Low Spend, High Risk)</h4>
+              <p><strong>1,745 accounts (34.2% churn rate)</strong>. Price-sensitive entry-tier subscribers. Address through low-touch digital onboarding, self-service portals, and automated email nurturing.</p>
+            </div>
+            <div class="insight-card" style="--accent-color: var(--accent-indigo);">
+              <h4>Quadrant IV: Stable Low Maintenance (Low Spend, Low Risk)</h4>
+              <p><strong>1,782 accounts (6.8% churn rate)</strong>. Minimal churn risk, highly satisfied low-touch accounts. Maintain baseline quality without disruptive pricing changes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 8: Strategic Playbook -->
+    <div id="tab-playbook" class="tab-panel">
+      <div class="report-section">
+        <h2 class="section-title">Data-Driven Strategic Retention Playbook</h2>
+        <p class="section-desc">Prioritized business interventions mapped directly to empirical churn root causes.</p>
+
+        <div class="insights-box" style="gap: 1.5rem;">
+          <div class="insight-card" style="--accent-color: var(--churn-red);">
+            <h4>1. 90-Day New Customer Onboarding & Support Warmth Protocol</h4>
+            <p><strong>Problem:</strong> 52.94% churn in months 0–6.<br>
+            <strong>Prescription:</strong> Automatically bundle 90 days of complimentary Tech Support and Online Security for all new subscribers. Implement proactive automated health pings at Day 7, Day 21, and Day 45.<br>
+            <strong>Financial Target:</strong> Recover $18,500/month ($222k/yr) by reducing first-year churn by 15%.</p>
+          </div>
+
+          <div class="insight-card" style="--accent-color: var(--warning-amber);">
+            <h4>2. Month-to-Month Contract Conversion Campaign</h4>
+            <p><strong>Problem:</strong> Month-to-month users represent 42.71% churn and $110.6k in lost MRR.<br>
+            <strong>Prescription:</strong> Launch an automated campaign at month 4 offering a $5/month billing credit or permanent speed upgrade in exchange for signing a 12-month commitment.<br>
+            <strong>Financial Target:</strong> Converting 20% of M2M users to annual contracts saves ~$22,100/month.</p>
+          </div>
+
+          <div class="insight-card" style="--accent-color: var(--retain-blue);">
+            <h4>3. Autopay Migration Program ($10 Credit Incentive)</h4>
+            <p><strong>Problem:</strong> Electronic check churn is 45.29% compared to 15.24% on autopay credit cards.<br>
+            <strong>Prescription:</strong> Offer a one-time $10 account credit for transitioning from manual electronic check to automated bank ACH or Credit Card.<br>
+            <strong>Financial Target:</strong> Migrating 800 accounts saves ~$14,200/month in avoided churn.</p>
+          </div>
+
+          <div class="insight-card" style="--accent-color: var(--success-emerald);">
+            <h4>4. Fiber Optic Service Assurance & Routing Priority</h4>
+            <p><strong>Problem:</strong> 41.89% churn on Fiber Optic accounts despite generating $91.50/mo ARPU.<br>
+            <strong>Prescription:</strong> Prioritize fiber support ticket queues, conduct automated line-quality diagnostics, and bundle free router replacement after 12 months.<br>
+            <strong>Financial Target:</strong> Reducing Fiber churn to 30% saves $33,600/month ($403k/yr).</p>
+          </div>
+        </div>
+
+        <!-- Interactive ROI Calculator -->
+        <div class="calculator-box">
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff;">Interactive Retention ROI Impact Simulator</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Model the financial upside of executing these retention initiatives across the customer portfolio:</p>
+
+          <div class="calc-controls">
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Target Churn Reduction</span>
+                <span id="slider-val" style="color: var(--accent-indigo); font-family: var(--font-mono); font-size: 1.1rem;">15%</span>
+              </div>
+              <input type="range" id="reduction-slider" min="5" max="40" step="1" value="15" oninput="updateCalculator()">
+            </div>
+
+            <div class="calc-results-grid">
+              <div class="calc-res-card">
+                <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Retained Accounts</div>
+                <div class="calc-res-val" id="res-accounts">280</div>
+                <div style="font-size: 0.75rem; color: #64748b;">accounts saved / year</div>
+              </div>
+
+              <div class="calc-res-card">
+                <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Monthly Cash Protected</div>
+                <div class="calc-res-val" id="res-mrr">$20,870</div>
+                <div style="font-size: 0.75rem; color: #64748b;">MRR preserved</div>
+              </div>
+
+              <div class="calc-res-card">
+                <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Annual Run-Rate Saved</div>
+                <div class="calc-res-val" id="res-annual" style="color: #38bdf8;">$250,436</div>
+                <div style="font-size: 0.75rem; color: #64748b;">top-line annual equity</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>Customer Churn Prediction & Lifetime Value (LTV) Engine • Week 4 Reporting Deliverable</p>
+      <p style="margin-top: 0.3rem; opacity: 0.7;">Generated automatically from <code>telco_feature_engineered_commit3.csv</code> and processed analytics pipelines.</p>
+    </footer>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      const activePanel = document.getElementById('tab-' + tabId);
+      if (activePanel) {
+        activePanel.classList.add('active');
+      }
+
+      event.currentTarget.classList.add('active');
+    }
+
+    function updateCalculator() {
+      const slider = document.getElementById('reduction-slider');
+      const val = parseInt(slider.value, 10);
+      document.getElementById('slider-val').textContent = val + '%';
+
+      const totalChurners = 1869;
+      const totalLostMRR = 139130.85;
+
+      const savedAccounts = Math.round(totalChurners * (val / 100));
+      const savedMRR = Math.round(totalLostMRR * (val / 100));
+      const savedAnnual = savedMRR * 12;
+
+      document.getElementById('res-accounts').textContent = savedAccounts.toLocaleString();
+      document.getElementById('res-mrr').textContent = '$' + savedMRR.toLocaleString();
+      document.getElementById('res-annual').textContent = '$' + savedAnnual.toLocaleString();
+    }
+
+    // Initialize calculator
+    updateCalculator();
+  </script>
+</body>
+</html>
