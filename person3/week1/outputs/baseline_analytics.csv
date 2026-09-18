@@ -1,0 +1,2 @@
+total_customers,churned_customers,non_churned_customers,churn_rate_percent,retention_rate_percent,baseline_accuracy_percent
+7043,1869,5174,26.54,73.46,73.46

@@ -1,0 +1,14 @@
+===== BASELINE ANALYTICS =====
+total_customers: 7043
+churned_customers: 1869
+non_churned_customers: 5174
+churn_rate_percent: 26.54
+retention_rate_percent: 73.46
+baseline_accuracy_percent: 73.46
+
+Churn Rate by Segment:
+TenureSegment
+Long Tenure      11.93
+Medium Tenure    25.54
+New Customer     47.44
+Name: Churn, dtype: float64
